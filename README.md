@@ -1,1 +1,1 @@
-# framex-premium
+FrameX Premium
