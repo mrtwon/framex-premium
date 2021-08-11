@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/fragmentHome"
-        android:name="com.mrtwon.framex.FragmentHome.FragmentHome"
+        android:name="com.mrtwon.framex_premium.FragmentHome.FragmentHome"
         android:label="FragmentHome" >
         <action
             android:id="@+id/action_fragmentHome_to_fragmentTop"
@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentTop"
-        android:name="com.mrtwon.framex.FragmentTop.FragmentTop"
+        android:name="com.mrtwon.framex_premium.FragmentTop.FragmentTop"
         android:label="FragmentTop" >
         <action
             android:id="@+id/action_fragmentTop_to_fragmentAboutMovie"
@@ -56,15 +56,15 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentAboutSerial"
-        android:name="com.mrtwon.framex.FragmentAbout.FragmentAboutSerial"
+        android:name="com.mrtwon.framex_premium.FragmentAbout.FragmentAboutSerial"
         android:label="FragmentAboutSerial" />
     <fragment
         android:id="@+id/fragmentAboutMovie"
-        android:name="com.mrtwon.framex.FragmentAbout.FragmentAboutMovie"
+        android:name="com.mrtwon.framex_premium.FragmentAbout.FragmentAboutMovie"
         android:label="FragmentAboutMovie" />
     <fragment
         android:id="@+id/fragmentFavorite"
-        android:name="com.mrtwon.framex.FragmentFavorite.FragmentFavorite"
+        android:name="com.mrtwon.framex_premium.FragmentFavorite.FragmentFavorite"
         android:label="FragmentFavorite" >
         <action
             android:id="@+id/action_fragmentFavorite_to_fragmentAboutMovie"
@@ -85,14 +85,14 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSearch"
-        android:name="com.mrtwon.framex.FragmentSearch.FragmentSearch"
+        android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearch"
         android:label="FragmentSearch" />
     <fragment
         android:id="@+id/fragmentSearchDescription"
-        android:name="com.mrtwon.framex.FragmentSearch.FragmentSearchDescription"
+        android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearchDescription"
         android:label="FragmentSearchDescription" />
     <fragment
         android:id="@+id/fragmentSubscription"
-        android:name="com.mrtwon.framex.FragmentSubscription.FragmentSubscription"
+        android:name="com.mrtwon.framex_premium.FragmentSubscription.FragmentSubscription"
         android:label="FragmentSubscription" />
 </navigation>

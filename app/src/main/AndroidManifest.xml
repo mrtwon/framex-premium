@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mrtwon.framex">
+    package="com.mrtwon.framex_premium">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".StartedActivity"
+        <activity android:name="com.mrtwon.framex_premium.StartedActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,23 +22,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".service.ServiceUpdate"/>
+        <service android:name="com.mrtwon.framex_premium.service.ServiceUpdate"/>
         <activity
-            android:name=".ActivityWebView.ActivityWebView"
+            android:name="com.mrtwon.framex_premium.ActivityWebView.ActivityWebView"
             android:theme="@style/Style.Video"
             android:configChanges="orientation|screenSize"
             />
         <!--<activity android:name=".ActivityUpdate.ActivityUpdate"/>-->
-        <activity android:name=".ActivityUpdate.ActivityUpdateSearch"
+        <activity android:name="com.mrtwon.framex_premium.ActivityUpdate.ActivityUpdateSearch"
             android:screenOrientation="portrait"
             />
-        <activity android:name=".ActivityUpdate.ActivityUpdate"
+        <activity android:name="com.mrtwon.framex_premium.ActivityUpdate.ActivityUpdate"
             android:screenOrientation="portrait"
             />
-        <activity android:name=".ActivityWelcome.ActivityWelcome"
+        <activity android:name="com.mrtwon.framex_premium.ActivityWelcome.ActivityWelcome"
             android:screenOrientation="portrait"
             />
-        <activity android:name=".MainActivity"
+        <activity android:name="com.mrtwon.framex_premium.MainActivity"
             android:screenOrientation="portrait"
             />
         <activity android:name=".TestWorker"
