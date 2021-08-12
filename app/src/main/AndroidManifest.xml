@@ -22,26 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.mrtwon.framex_premium.service.ServiceUpdate"/>
         <activity
             android:name="com.mrtwon.framex_premium.ActivityWebView.ActivityWebView"
             android:theme="@style/Style.Video"
             android:configChanges="orientation|screenSize"
             />
         <!--<activity android:name=".ActivityUpdate.ActivityUpdate"/>-->
-        <activity android:name="com.mrtwon.framex_premium.ActivityUpdate.ActivityUpdateSearch"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name="com.mrtwon.framex_premium.ActivityUpdate.ActivityUpdate"
-            android:screenOrientation="portrait"
-            />
         <activity android:name="com.mrtwon.framex_premium.ActivityWelcome.ActivityWelcome"
             android:screenOrientation="portrait"
             />
         <activity android:name="com.mrtwon.framex_premium.MainActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".TestWorker"
             android:screenOrientation="portrait"
             />
     </application>

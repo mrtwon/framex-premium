@@ -4,7 +4,7 @@ import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
 import com.github.mrtwon.library.XmlParse
 import com.mrtwon.framex_premium.GeneralVM
 import com.mrtwon.framex_premium.Model.Model
-import com.mrtwon.framex_premium.Model.NewModel
+import com.mrtwon.framex_premium.Model.ModelApi
 import com.mrtwon.framex_premium.Modules.ApiModule
 import com.mrtwon.framex_premium.Modules.ModuleModel
 import com.mrtwon.framex_premium.Retrofit.VideoCdn.VideoCdnApi
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class AppComponents {
     abstract fun inject(vm: GeneralVM)
 
-    abstract fun getNewModel(): NewModel
+    abstract fun getNewModel(): ModelApi
 
     abstract fun getModel(): Model
 

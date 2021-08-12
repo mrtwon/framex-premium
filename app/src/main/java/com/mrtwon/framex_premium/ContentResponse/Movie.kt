@@ -2,7 +2,7 @@ package com.mrtwon.framex_premium.ContentResponse
 
 import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseMovie.*
 
-class Movie: Content(){
+class Movie: ContentResponse(){
 
     //kinopoisk
     var premiereDvd: Any? = null

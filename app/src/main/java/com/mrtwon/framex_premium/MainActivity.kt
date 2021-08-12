@@ -11,7 +11,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
-import com.mrtwon.framex_premium.ActivityUpdate.ActivityUpdate
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
     lateinit var navController: NavController
@@ -45,9 +44,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             R.id.favorite -> { navController.navigate(R.id.fragmentFavorite) }
             R.id.home -> { navController.navigate(R.id.fragmentHome)}
             R.id.search -> {  navController.navigate(R.id.fragmentSearch) }
-            R.id.update -> {
-                startActivity(Intent(this, ActivityUpdate::class.java))
-            }
         }
         return true
     }

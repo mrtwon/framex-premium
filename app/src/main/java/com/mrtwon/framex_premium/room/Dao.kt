@@ -61,7 +61,11 @@ interface Dao {
 
     @Query("SELECT * FROM Favorite")
     fun getFavorite(): List<Favorite>
-    @Query("SELECT * FROM Favorite WHERE id_ref = :id AND contentType = :contentType")
+
+    @Query("SELECT * FROM Favorite WHERE id_content = :id")
+    fun getFavoriteIdLiveData(id: Int): LiveData<Favorite>
+
+    @Query("SELECT * FROM Favorite WHERE id_content = :id AND content_type = :contentType")
     fun getFavoriteElement(id: Int, contentType: String): Favorite?
 
     @Query("SELECT * FROM Movie WHERE id = :id")
@@ -72,6 +76,9 @@ interface Dao {
 
     @Query("DELETE FROM Favorite WHERE id_ref = :id AND contentType = :contentType")
     fun deleteFavoriteElement(id: Int, contentType: String)
+
+    @Delete
+    fun deleteFavorite(favorite: Favorite)
 
     @Query("SELECT * FROM Serial WHERE id = :id")
     fun getSerial(id: Int): Serial

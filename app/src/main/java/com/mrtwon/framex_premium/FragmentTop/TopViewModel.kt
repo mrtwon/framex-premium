@@ -2,23 +2,20 @@ package com.mrtwon.framex_premium.FragmentTop
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.example.startandroid.MyApplication
 import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
-import com.mrtwon.framex_premium.ContentResponse.Content
-import com.mrtwon.framex_premium.Model.NewModel
+import com.mrtwon.framex_premium.ContentResponse.ContentResponse
+import com.mrtwon.framex_premium.GeneralVM
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class TopViewModel: ViewModel() {
-    var model: NewModel = MyApplication.getInstance.appComponents.getNewModel()
-    val listLiveData =  MutableLiveData<List<Content>>()
+class TopViewModel: GeneralVM() {
+    val listLiveData =  MutableLiveData<List<ContentResponse>>()
     @DelicateCoroutinesApi
     fun getContentByGenresEnum(genres: GenresEnum, content: ContentTypeEnum){
         log("start vm function")
-        model.getTopByGenresEnumTest(genres, content){
+        model.getTopByGenresEnum(genres, content){
             listLiveData.postValue(it)
         }
     }

@@ -9,23 +9,18 @@ import com.mrtwon.framex_premium.room.Favorite
 
 class FavoriteViewModel: GeneralVM() {
 
-    private val favoriteLiveData: LiveData<List<Favorite>> = model.db.dao().getFavoriteLiveData()
-    val contentList = MutableLiveData<List<Content>>()
+    val favoriteLiveData: LiveData<List<Favorite>> = model.db.dao().getFavoriteLiveData()
+    /*val favoriteList = MutableLiveData<List<Favorite>>()
 
-    init {
-        favoriteLiveData.observeForever {
-            getContent()
-        }
-    }
-    fun getContent(){
+    fun getFavorite(){
         Log.i("self-favorite","getContent()")
         model.getFavorite {
-            contentList.postValue(it)
+            favoriteList.postValue(it)
         }
-    }
+    }*/
 
-    fun removeFavorite(id: Int, contentType: String){
-        model.removeFavorite(id, contentType)
+    fun removeFavorite(favorite: Favorite){
+        model.removeFavorite(favorite)
     }
 
 }

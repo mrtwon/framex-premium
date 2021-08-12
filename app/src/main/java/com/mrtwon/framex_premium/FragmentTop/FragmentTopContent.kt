@@ -18,7 +18,7 @@ import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
 import com.mrtwon.framex_premium.Content.ParcelableEnum
-import com.mrtwon.framex_premium.ContentResponse.Content
+import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.Helper.HelperFunction.Companion.roundRating
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
@@ -32,7 +32,7 @@ import java.lang.Exception
 class FragmentTopContent: Fragment() {
     val vm: TopViewModel by lazy { ViewModelProvider(this).get(TopViewModel::class.java) }
     val controller by lazy { (requireActivity() as MainActivity).navController }
-    val listContent = arrayListOf<Content>()
+    val listContent = arrayListOf<ContentResponse>()
     lateinit var gif_load: GifImageView
     //val mainVm: MainViewModel by lazy { ViewModelProvider(requireActivity()).get(MainViewModel::class.java) }
 
@@ -96,7 +96,7 @@ class FragmentTopContent: Fragment() {
         lateinit var rating_kp: TextView
         lateinit var rating_imdb: TextView
         lateinit var title: TextView
-        fun build(content: Content){
+        fun build(content: ContentResponse){
             //init
             content_layout = itemView.findViewById(R.id.content_layout)
             poster = itemView.findViewById(R.id.poster)
@@ -131,7 +131,7 @@ class FragmentTopContent: Fragment() {
 
         }
     }
-    inner class Adapter(val contentList: List<Content>): RecyclerView.Adapter<ViewHolder>() {
+    inner class Adapter(val contentList: List<ContentResponse>): RecyclerView.Adapter<ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = layoutInflater.inflate(R.layout.one_top_element, parent, false)
             return ViewHolder(view)

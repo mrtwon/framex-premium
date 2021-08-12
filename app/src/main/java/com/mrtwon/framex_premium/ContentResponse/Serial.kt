@@ -4,7 +4,7 @@ import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseSerial.CountriesItem
 import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseSerial.GenresItem
 import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseSerial.ResponseSerialItem
 
-class Serial: Content(){
+class Serial: ContentResponse(){
     //kinopoisk
     var premiereDvd: Any? = null
     var filmLength: String? = null

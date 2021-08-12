@@ -8,9 +8,13 @@ import com.mrtwon.framex_premium.room.Database
 import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
+import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.Retrofit.Kinopoisk.POJOKinopoisk
 import com.mrtwon.framex_premium.Retrofit.KinopoiskRating.RatingApi
 import com.mrtwon.framex_premium.Retrofit.KinopoiskRating.RatingPOJO
+import com.mrtwon.framex_premium.Retrofit.TestPOJO.FramexApi
+import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseMovie.ResponseMovie
+import com.mrtwon.framex_premium.Retrofit.TestPOJO.ResponseSerial.ResponseSerial
 import com.mrtwon.framex_premium.Retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.*
 import kotlinx.coroutines.*
@@ -20,11 +24,116 @@ import java.util.*
 * Model Class
 * Working with network and database
  */
-class Model(val db: Database, private val kinopoiskApi: KinopoiskApi,
-            private val videoCdnApi: VideoCdnApi, private val ratingApi: XmlParse) {
+class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private val videoCdnApi: VideoCdnApi, private val ratingApi: XmlParse, private val fxApi: FramexApi) {
     /*
-    Model Api
+    Model Api Fx
      */
+
+    @DelicateCoroutinesApi
+    fun searchContentByTitle(query: String, callback: (List<ContentResponse>) -> Unit){
+        GlobalScope.launch {
+            val callbackResult = arrayListOf<ContentResponse>()
+            val responseMovie = fxApi.searchMovieByTitle(query)
+            val responseSerial = fxApi.searchSerialByTitle(query)
+            val resultSerial = giveListContentFromResponseSerial(responseSerial.execute().body())
+            val resultMovie = giveListContentFromResponseMovie(responseMovie.execute().body())
+            callbackResult.addAll(resultMovie)
+            callbackResult.addAll(resultSerial)
+            callback(callbackResult)
+        }
+    }
+
+    @DelicateCoroutinesApi
+    fun searchContentByDescription(query: String, callback: (List<ContentResponse>) -> Unit){
+        GlobalScope.launch {
+            val queryLowerCase = query.toLowerCase(Locale.ROOT)
+            val callbackResult = arrayListOf<ContentResponse>()
+            val responseMovie = fxApi.searchMovieByDescription(queryLowerCase)
+            val responseSerial = fxApi.searchSerialByDescription(queryLowerCase)
+            val resultSerial = giveListContentFromResponseSerial(responseSerial.execute().body())
+            val resultMovie = giveListContentFromResponseMovie(responseMovie.execute().body())
+            callbackResult.addAll(resultMovie)
+            callbackResult.addAll(resultSerial)
+            callback(ParseHtmlPrompt(callbackResult, queryLowerCase))
+        }
+    }
+
+    @DelicateCoroutinesApi
+    fun getAboutMovie(id: Int, callback: (com.mrtwon.framex_premium.ContentResponse.Movie?) -> Unit){
+        GlobalScope.launch {
+            val response = fxApi.getAboutMovie(id).execute().body()
+            val result = com.mrtwon.framex_premium.ContentResponse.Movie.buildMovie(response?.response?.get(0))
+            callback(result)
+        }
+    }
+
+    @DelicateCoroutinesApi
+    fun getAboutSerial(id: Int, callback: (com.mrtwon.framex_premium.ContentResponse.Serial?) -> Unit){
+        GlobalScope.launch {
+            val response = fxApi.getAboutSerial(id).execute().body()
+            val result = com.mrtwon.framex_premium.ContentResponse.Serial.buildSerial(response?.response?.get(0))
+            callback(result)
+        }
+    }
+
+    @DelicateCoroutinesApi
+    fun getTopByGenresEnum(genres: GenresEnum, content: ContentTypeEnum, callback: (List<ContentResponse>) -> Unit){
+        log("start gettop ..., contentType: ${content.toString()}")
+        GlobalScope.launch {
+            when(content){
+                ContentTypeEnum.SERIAL ->{
+                    val response = fxApi.getTopSerialByGenres(genres.toString()).execute().body()
+                    val result = giveListContentFromResponseSerial(response)
+                    callback(result)
+                }
+                ContentTypeEnum.MOVIE -> {
+                    log("start case")
+                    val response = fxApi.getTopMovieByGenres(genres.toString()).execute()
+                    val result = giveListContentFromResponseMovie(response.body())
+                    log("result size = ${result.size}")
+                    callback(result)
+                    log("response code: ${response.code()}")
+                }
+            }
+        }
+    }
+
+
+    //helper function
+    private fun giveListContentFromResponseSerial(responseSerial: ResponseSerial?): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
+        if(responseSerial == null) return result
+        val response = responseSerial.response ?: return result
+        for(element in response){
+            val content = com.mrtwon.framex_premium.ContentResponse.Serial.buildSerial(element)
+            if(content != null) result.add(content)
+        }
+        return result
+    }
+    private fun giveListContentFromResponseMovie(responseMovie: ResponseMovie?): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
+        if(responseMovie == null) return result
+        val response = responseMovie.response ?: return result
+        log("responseMovie size = ${response.size}")
+        for(element in response){
+            val content = com.mrtwon.framex_premium.ContentResponse.Movie.buildMovie(element)
+            if(content != null) result.add(content)
+        }
+        return result
+    }
+    fun ParseHtmlPrompt(contents: List<ContentResponse>, findString: String): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
+        for(element in contents){
+            element.description?.let {
+                element.description = htmlPrompt(findString, it)
+            }
+            result.add(element)
+        }
+        return result
+    }
+
+    //log
+    private fun log(s: String) { Log.i("self-model",s) }
 
 
     fun searchSerial(query: String, callback: (List<Serial>) -> Unit, noConnect: (Boolean) -> Unit){
@@ -107,7 +216,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi,
     Model Database
      */
 
-    @DelicateCoroutinesApi
+   /* @DelicateCoroutinesApi
     fun getTopByGenresEnum(genres: GenresEnum, content: ContentTypeEnum, callback: (List<Content>) -> Unit){
         GlobalScope.launch {
             when(content){
@@ -121,7 +230,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi,
                 }
             }
         }
-    }
+    }*/
     @DelicateCoroutinesApi
     fun getTopByCollectionEnum(collectionEnum: CollectionContentEnum, content: ContentTypeEnum, callback: (List<Content>) -> Unit){
         GlobalScope.launch {
@@ -138,75 +247,55 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi,
             }
         }
     }
-    @DelicateCoroutinesApi
+   /* @DelicateCoroutinesApi
     fun getAboutSerial(id: Int, callback: (SerialWithGenres) -> Unit){
         GlobalScope.launch {
             val result = db.dao().getAboutSerial(id)
             Log.i("self-model","description length = ${result.description?.length}")
             callback(result)
         }
-    }
+    }*/
 
-    @DelicateCoroutinesApi
+   /* @DelicateCoroutinesApi
     fun getAboutMovie(id: Int, callback: (MovieWithGenres) -> Unit){
         GlobalScope.launch {
             val result = db.dao().getAboutMovie(id)
             Log.i("self-model","description length = ${result.description?.length}")
             callback(result)
         }
-    }
+    }*/
 
-    fun getFavorite(callback: (List<Content>) -> Unit) {
+    fun getFavorite(callback: (List<Favorite>) -> Unit) {
         GlobalScope.launch {
             val listFavorite = db.dao().getFavorite()
-            val result = arrayListOf<Content>()
-            Log.i("self-model", "listFavorite = ${listFavorite.size}")
-            for (favorite in listFavorite) {
-                favorite.idRef?.let {
-                    when (favorite.contentType) {
-                        "movie" -> {
-                            result.add(db.dao().getMovie(it) as Content)
-                        }
-                        "tv_series" -> {
-                            Log.i("self-model","seria id = $it")
-                            result.add(db.dao().getSerial(it) as Content)
-                        }
-                        else -> {
-                        }
-                    }
-                }
-            }
-            callback(result)
+            callback(listFavorite)
         }
     }
-    fun addFavorite(id: Int, contentType: String){
+
+
+    fun favoriteAction(content: ContentResponse){
         GlobalScope.launch {
-            val isExistElement = db.dao().getFavoriteElement(id, contentType) == null
-            if (isExistElement) {
-                val favoriteResult = Favorite().apply {
-                    this.idRef = id
-                    this.contentType = contentType
-                }
-                db.dao().addFavorite(favoriteResult)
+            val isFavorite = db.dao().getFavoriteElement(content.id, content.contentType) != null
+            if(isFavorite){
+                db.dao().deleteFavoriteElement(content.id, content.contentType)
+            }else{
+                db.dao().addFavorite(Favorite().apply {
+                    id_content = content.id
+                    poster = content.poster
+                    ru_title = content.ru_title
+                    content_type = content.contentType
+                })
             }
         }
     }
-    fun removeFavorite(id: Int, contentType: String) {
+
+
+    fun removeFavorite(favorite: Favorite) {
         GlobalScope.launch {
-            db.dao().deleteFavoriteElement(id, contentType)
+            db.dao().deleteFavorite(favorite)
         }
     }
-    fun isFavorite(id: Int, contentType: String, callback: (Boolean) -> Unit){
-        GlobalScope.launch {
-            val result = db.dao().getFavoriteElement(id, contentType) != null
-            callback(result)
-        }
-    }
-    suspend fun testLiveData(): LiveData<List<Favorite>>{
-        return GlobalScope.async{
-            db.dao().getFavoriteLiveData()
-        }.await()
-    }
+
     fun getVideoLink(id: Int, contentType: String, callback: (Content) -> Unit){
         GlobalScope.launch {
             when (contentType) {

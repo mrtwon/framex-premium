@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull
 @Entity
 class Favorite {
     @PrimaryKey @NotNull @ColumnInfo(name = "id") var id: Int? = null
-    @ColumnInfo(name = "id_ref") var idRef: Int? = null
-    @ColumnInfo(name = "contentType") var contentType: String? = null
+    @ColumnInfo(name = "id_content") var id_content: Int = 0
+    @ColumnInfo(name = "ru_title") var ru_title: String = ""
+    @ColumnInfo(name = "content_type") var content_type: String = ""
+    @ColumnInfo(name = "poster") var poster: String? = null
 }

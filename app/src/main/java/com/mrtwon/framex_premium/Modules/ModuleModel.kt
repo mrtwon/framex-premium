@@ -7,7 +7,7 @@ import com.example.startandroid.MyApplication
 import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
 import com.github.mrtwon.library.XmlParse
 import com.mrtwon.framex_premium.Model.Model
-import com.mrtwon.framex_premium.Model.NewModel
+import com.mrtwon.framex_premium.Model.ModelApi
 import com.mrtwon.framex_premium.Retrofit.TestPOJO.FramexApi
 import com.mrtwon.framex_premium.Retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.Database
@@ -20,8 +20,8 @@ class ModuleModel {
 
    @Singleton
    @Provides
-   fun getNewModel(db: Database, api: FramexApi): NewModel{
-      return NewModel(db, api)
+   fun getNewModel(db: Database, api: FramexApi): ModelApi{
+      return ModelApi(db, api)
    }
 
    @Singleton

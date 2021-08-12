@@ -16,13 +16,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.room.Content
+import com.mrtwon.framex_premium.room.Favorite
 import com.squareup.picasso.Picasso
 
 class FragmentFavorite: Fragment() {
     val vm: FavoriteViewModel by lazy { ViewModelProvider(this).get(FavoriteViewModel::class.java) }
     lateinit var recycler_view: RecyclerView
     lateinit var tv_not_found: TextView
-    val contentList = arrayListOf<Content>()
+    val favoriteList = arrayListOf<Favorite>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -30,9 +31,8 @@ class FragmentFavorite: Fragment() {
         recycler_view = view.findViewById(R.id.recycler_view)
         tv_not_found = view.findViewById(R.id.textView_favorite_not_found)
         recycler_view.layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
-        observerContent()
-        vm.getContent()
-        recycler_view.adapter = Adapter(contentList)
+        observerFavorite()
+        recycler_view.adapter = Adapter(favoriteList)
         return view
     }
 
@@ -40,14 +40,14 @@ class FragmentFavorite: Fragment() {
         (activity as MainActivity).reselectedNavigationPosition()
         super.onStart()
     }
-    fun observerContent(){
-        vm.contentList.observe(viewLifecycleOwner, Observer {
+    fun observerFavorite(){
+        vm.favoriteLiveData.observe(viewLifecycleOwner, Observer {
             if(it.isEmpty()){
                 recycler_view.visibility = View.GONE
                 tv_not_found.visibility = View.VISIBLE
             }else{
-                contentList.clear()
-                contentList.addAll(it.reversed())
+                favoriteList.clear()
+                favoriteList.addAll(it.reversed())
                 recycler_view.adapter?.notifyDataSetChanged()
                 tv_not_found.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
@@ -62,18 +62,14 @@ class FragmentFavorite: Fragment() {
         val contentType: TextView = itemView.findViewById(R.id.contentType)
         val btn_delete: Button = itemView.findViewById(R.id.btn_delete_favorite)
 
-        fun bind(content: Content){
+        fun bind(favorite: Favorite){
 
             btn_delete.setOnClickListener{
-                if(content.contentType != null){
-                    Log.i("self-favorite","start remove ${content.id} | ${content.contentType}")
-                    contentList.remove(content)
-                    vm.removeFavorite(content.id, content.contentType!!)
-                }
+                    vm.removeFavorite(favorite)
             }
             poster.setOnClickListener{
-                val bundle = Bundle().apply { putInt("id", content.id) }
-                when(content.contentType){
+                val bundle = Bundle().apply { putInt("id", favorite.id_content) }
+                when(favorite.content_type){
                     "movie" -> {
                         (requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentFavorite_to_fragmentAboutMovie, bundle)
                     }
@@ -82,25 +78,18 @@ class FragmentFavorite: Fragment() {
                     }
                 }
             }
-
-            content.ru_title?.let {
-                title.text = it
-            }
-
-            content.contentType?.let {
-                contentType.text = when(it){
-                    "movie" -> "Фильм"
-                    else -> "Сериал"
-                }
-            }
-
+           title.text = favorite.ru_title
+           contentType.text = when(favorite.content_type){
+               "movie" -> "Фильм"
+               "tv_series" -> "Сериал"
+               else -> "Unknown"
+           }
             Picasso.get()
-                .load(content.poster)
+                .load(favorite.poster)
                 .into(poster)
-
         }
     }
-    inner class Adapter(val listContent: List<Content>) : RecyclerView.Adapter<ViewHolder>(){
+    inner class Adapter(val listContent: List<Favorite>) : RecyclerView.Adapter<ViewHolder>(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(layoutInflater.inflate(R.layout.one_favorite_element, parent, false))
         }

@@ -1,9 +1,10 @@
+/*
 package com.mrtwon.framex_premium.Model
 
 import android.util.Log
 import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
-import com.mrtwon.framex_premium.ContentResponse.Content
+import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.ContentResponse.Movie
 import com.mrtwon.framex_premium.ContentResponse.Serial
 import com.mrtwon.framex_premium.Retrofit.TestPOJO.FramexApi
@@ -13,8 +14,39 @@ import com.mrtwon.framex_premium.room.Database
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
 
-class NewModel(val database: Database, val fxApi: FramexApi) {
+class ModelApi(val database: Database, val fxApi: FramexApi) {
+
+    @DelicateCoroutinesApi
+    fun searchContentByTitle(query: String, callback: (List<ContentResponse>) -> Unit){
+        GlobalScope.launch {
+            val callbackResult = arrayListOf<ContentResponse>()
+            val responseMovie = fxApi.searchMovieByTitle(query)
+            val responseSerial = fxApi.searchSerialByTitle(query)
+            val resultSerial = giveListContentFromResponseSerial(responseSerial.execute().body())
+            val resultMovie = giveListContentFromResponseMovie(responseMovie.execute().body())
+            callbackResult.addAll(resultMovie)
+            callbackResult.addAll(resultSerial)
+            callback(callbackResult)
+        }
+    }
+
+    @DelicateCoroutinesApi
+    fun searchContentByDescription(query: String, callback: (List<ContentResponse>) -> Unit){
+        GlobalScope.launch {
+            val queryLowerCase = query.toLowerCase(Locale.ROOT)
+            val callbackResult = arrayListOf<ContentResponse>()
+            val responseMovie = fxApi.searchMovieByDescription(queryLowerCase)
+            val responseSerial = fxApi.searchSerialByDescription(queryLowerCase)
+            val resultSerial = giveListContentFromResponseSerial(responseSerial.execute().body())
+            val resultMovie = giveListContentFromResponseMovie(responseMovie.execute().body())
+            callbackResult.addAll(resultMovie)
+            callbackResult.addAll(resultSerial)
+            callback(ParseHtmlPrompt(callbackResult, queryLowerCase))
+        }
+    }
+
     @DelicateCoroutinesApi
     fun getAboutMovie(id: Int, callback: (Movie?) -> Unit){
         GlobalScope.launch {
@@ -34,7 +66,7 @@ class NewModel(val database: Database, val fxApi: FramexApi) {
     }
 
     @DelicateCoroutinesApi
-    fun getTopByGenresEnumTest(genres: GenresEnum, content: ContentTypeEnum, callback: (List<Content>) -> Unit){
+    fun getTopByGenresEnumTest(genres: GenresEnum, content: ContentTypeEnum, callback: (List<ContentResponse>) -> Unit){
         log("start gettop ..., contentType: ${content.toString()}")
         GlobalScope.launch {
             when(content){
@@ -57,8 +89,8 @@ class NewModel(val database: Database, val fxApi: FramexApi) {
 
 
     //helper function
-    private fun giveListContentFromResponseSerial(responseSerial: ResponseSerial?): List<Content>{
-        val result = arrayListOf<Content>()
+    private fun giveListContentFromResponseSerial(responseSerial: ResponseSerial?): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
         if(responseSerial == null) return result
         val response = responseSerial.response ?: return result
         for(element in response){
@@ -67,8 +99,8 @@ class NewModel(val database: Database, val fxApi: FramexApi) {
         }
         return result
     }
-    private fun giveListContentFromResponseMovie(responseMovie: ResponseMovie?): List<Content>{
-        val result = arrayListOf<Content>()
+    private fun giveListContentFromResponseMovie(responseMovie: ResponseMovie?): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
         if(responseMovie == null) return result
         val response = responseMovie.response ?: return result
         log("responseMovie size = ${response.size}")
@@ -78,6 +110,22 @@ class NewModel(val database: Database, val fxApi: FramexApi) {
         }
         return result
     }
+
+    fun htmlPrompt(findString: String, data: String): String {
+        return data.replace(findString, "<b>$findString</b>")
+    }
+
+    fun ParseHtmlPrompt(contents: List<ContentResponse>, findString: String): List<ContentResponse>{
+        val result = arrayListOf<ContentResponse>()
+        for(element in contents){
+            element.description?.let {
+                element.description = htmlPrompt(findString, it)
+            }
+            result.add(element)
+        }
+        return result
+    }
+
     //log
     private fun log(s: String) { Log.i("self-new-model",s) }
-}
+}*/

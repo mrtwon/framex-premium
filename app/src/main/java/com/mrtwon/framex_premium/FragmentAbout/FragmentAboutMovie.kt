@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
+import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.databinding.FragmentAboutMovieBinding
@@ -36,7 +37,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
     lateinit var tool_bar: MaterialToolbar
     lateinit var frame_layout: FrameLayout
     var id: Int? = null
-
+    var contentResponse: ContentResponse? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         id = requireArguments().getInt("id")
         super.onCreate(savedInstanceState)
@@ -73,18 +74,17 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
     @DelicateCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observerAbout()
-        observerIsFavorite()
         id?.let {
-            aboutVM.isFavorite(it)
+            observerIsFavorite(it)
             aboutVM.getAbout(it)
         }
         super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun observerIsFavorite(){
-        aboutVM.isFavoriteBoolean.observe(viewLifecycleOwner, Observer {
+    private fun observerIsFavorite(id: Int){
+        aboutVM.getFavoriteLiveData(id).observe(viewLifecycleOwner, Observer {
             val favoriteIconElement = tool_bar.menu.findItem(R.id.favorite)
-            if(it) {
+            if(it == null) {
                 favoriteIconElement.icon = DRAWABLE_ON
             }else {
                 favoriteIconElement.icon = DRAWABLE_OFF
@@ -130,6 +130,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
         aboutVM.contentData.observe(viewLifecycleOwner){
             // data binding
             //Log.i("self-about","[test] ${it.ru_title_lower} ${it.year}")
+            contentResponse = it
             view.movie = MovieDataBinding(it)
 
             //load poster
@@ -160,13 +161,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.favorite -> {
-                if(item.icon.equals(DRAWABLE_ON)){
-                    id?.let { aboutVM.deleteFavorite(it) }
-                    item.icon = DRAWABLE_OFF
-                } else{
-                    id?.let { aboutVM.addFavorite(it) }
-                    item.icon = DRAWABLE_ON
-                }
+                contentResponse?.let {aboutVM.favoriteAction(it)}
             }
         }
         return true
