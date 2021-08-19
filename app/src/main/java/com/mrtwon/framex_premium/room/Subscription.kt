@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 class Subscription {
-    @PrimaryKey var id: Int? = null
+    @PrimaryKey @ColumnInfo(name = "id") var id: Int? = null
     @ColumnInfo(name = "content_id") var content_id: Int = 0
+    @ColumnInfo(name = "poster") var poster: String? = null
     @ColumnInfo(name = "count") var count: Int = 0
 }

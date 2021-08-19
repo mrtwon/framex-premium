@@ -15,13 +15,13 @@ import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.room.Notification
-import com.mrtwon.framex_premium.room.Serial
+import com.mrtwon.framex_premium.room.Subscription
 import com.squareup.picasso.Picasso
 
 class FragmentSubscription:  Fragment(){
     val vm: SubscriptionVM by lazy { ViewModelProvider(this).get(SubscriptionVM::class.java) }
     val listNotification = arrayListOf<Notification>()
-    val listSubscription = arrayListOf<Serial>()
+    val listSubscription = arrayListOf<Subscription>()
     lateinit var rv_notification: RecyclerView
     lateinit var rv_subscription: RecyclerView
     lateinit var helper_notify: TextView
@@ -105,18 +105,18 @@ class FragmentSubscription:  Fragment(){
     inner class SubscriptionViewHolder(private val itemView: View): RecyclerView.ViewHolder(itemView){
         val poster: ImageView = itemView.findViewById(R.id.poster)
         val delete: ImageButton = itemView.findViewById(R.id.btn_delete_subscription)
-        fun bind(serial: Serial){
-            Picasso.get().load(serial.poster).into(poster)
+        fun bind(subscription: Subscription){
+            Picasso.get().load(subscription.poster).into(poster)
             delete.setOnClickListener{
-                vm.removeSubscription(serial.id)
+                vm.removeSubscription(subscription)
             }
             poster.setOnClickListener{
-                val bundle = Bundle().apply { putInt("id", serial.id) }
+                val bundle = Bundle().apply { putInt("id", subscription.content_id) }
                 (requireActivity() as MainActivity).navController.navigate(R.id.fragmentAboutSerial, bundle)
             }
         }
     }
-    inner class SubscriptionAdapter(private val list: List<Serial>): RecyclerView.Adapter<SubscriptionViewHolder>(){
+    inner class SubscriptionAdapter(private val list: List<Subscription>): RecyclerView.Adapter<SubscriptionViewHolder>(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubscriptionViewHolder {
             return SubscriptionViewHolder(layoutInflater.inflate(R.layout.one_element_subscription, parent, false))
         }

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -29,17 +30,21 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import pl.droidsonroids.gif.GifImageView
 import java.lang.Exception
 
-class FragmentTopContent: Fragment() {
+class FragmentTopContent: Fragment(), View.OnClickListener {
     val vm: TopViewModel by lazy { ViewModelProvider(this).get(TopViewModel::class.java) }
     val controller by lazy { (requireActivity() as MainActivity).navController }
-    val listContent = arrayListOf<ContentResponse>()
-    lateinit var gif_load: GifImageView
-    //val mainVm: MainViewModel by lazy { ViewModelProvider(requireActivity()).get(MainViewModel::class.java) }
 
+    lateinit var gif_load: GifImageView
     lateinit var contentType: ContentTypeEnum
+    lateinit var rv: RecyclerView
+    lateinit var not_found: LinearLayout
+    lateinit var connect_error: LinearLayout
+    lateinit var reload: Button
+
+    val listContent = arrayListOf<ContentResponse>()
     var genres: GenresEnum? = null
     var collection: CollectionContentEnum? = null
-    lateinit var rv: RecyclerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("self-top","onCreate()")
         // init content data of arg
@@ -50,12 +55,21 @@ class FragmentTopContent: Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    override fun onDestroyView() {
+        log("onDestroyView()")
+        super.onDestroyView()
+    }
     @DelicateCoroutinesApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        log("onCreateView")
         val view = inflater.inflate(R.layout.recyclerview_top_element, container, false)
         rv = view.recycler_view
         rv.adapter = Adapter(listContent)
         gif_load = view.findViewById(R.id.gif_load)
+        connect_error = view.findViewById(R.id.error_load)
+        not_found = view.findViewById(R.id.not_found)
+        reload = view.findViewById(R.id.reload)
+        reload.setOnClickListener(this)
         rv.layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
         observer()
         if(genres != null){
@@ -68,6 +82,7 @@ class FragmentTopContent: Fragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        log("saveInstanceState")
         rv.layoutManager?.onSaveInstanceState()?.let {
             outState.putParcelable("layout_manager",it)
         }
@@ -81,14 +96,46 @@ class FragmentTopContent: Fragment() {
         super.onActivityCreated(savedInstanceState)
     }
     fun observer(){
-        vm.listLiveData.observe(viewLifecycleOwner, Observer {
+        vm.listLiveData.observe(viewLifecycleOwner) {
             log("observer is running")
-            listContent.clear()
-            listContent.addAll(it)
-            rv.adapter?.notifyDataSetChanged()
-            gif_load.visibility = View.GONE
-            rv.visibility = View.VISIBLE
-        })
+            if (listContent.isEmpty() && it.isEmpty()) {
+                vm.notFoundLiveData.postValue(true)
+            } else {
+                clearVisibility()
+                listContent.addAll(it)
+                rv.adapter?.notifyDataSetChanged()
+                rv.visibility = View.VISIBLE
+            }
+        }
+        vm.connectErrorLiveData.observe(viewLifecycleOwner){
+            if(it) {
+                clearVisibility()
+                connect_error.visibility = View.VISIBLE
+                vm.connectErrorLiveData.postValue(false)
+            }
+        }
+        vm.notFoundLiveData.observe(viewLifecycleOwner) {
+            if (it) {
+                clearVisibility()
+                not_found.visibility = View.VISIBLE
+                vm.notFoundLiveData.postValue(false)
+            }
+        }
+        vm.loadLiveData.observe(viewLifecycleOwner){
+            if(it){
+                clearVisibility()
+                gif_load.visibility = View.VISIBLE
+            }else{
+                clearVisibility()
+                gif_load.visibility = View.GONE
+            }
+        }
+    }
+    fun clearVisibility(){
+        rv.visibility = View.GONE
+        not_found.visibility = View.GONE
+        connect_error.visibility = View.GONE
+        gif_load.visibility = View.GONE
     }
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         lateinit var content_layout: LinearLayout
@@ -138,6 +185,10 @@ class FragmentTopContent: Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if(position == contentList.size-1){
+                if(genres != null) vm.giveNextPageGenres(genres!!, contentType)
+                else if(collection != null) vm.giveNextPageCollection(collection!!, contentType)
+            }
             holder.build(contentList[position])
         }
 
@@ -174,6 +225,28 @@ class FragmentTopContent: Fragment() {
     }
     private fun log(s: String){
         Log.i("self-top-content",s)
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.reload -> {
+                if(genres != null){
+                    if(listContent.isEmpty()){
+                        vm.getContentByGenresEnum(genres!!, contentType)
+                    }else{
+                        vm.giveNextPageGenres(genres!!, contentType)
+                    }
+                }
+                else if(collection != null){
+                    if(listContent.isEmpty()){
+                        vm.getContentByCollectionEnum(collection!!, contentType)
+                    }else{
+                        vm.giveNextPageCollection(collection!!, contentType)
+                    }
+                }
+
+            }
+        }
     }
 
 }

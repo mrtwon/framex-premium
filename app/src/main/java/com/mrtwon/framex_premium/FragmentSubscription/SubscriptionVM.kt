@@ -3,27 +3,15 @@ package com.mrtwon.framex_premium.FragmentSubscription
 import androidx.lifecycle.MutableLiveData
 import com.mrtwon.framex_premium.GeneralVM
 import com.mrtwon.framex_premium.room.Notification
-import com.mrtwon.framex_premium.room.Serial
+import com.mrtwon.framex_premium.room.Subscription
 
 class SubscriptionVM: GeneralVM() {
     val notificationListLiveData = model.getNotificationListLiveData()
-    private val subscriptionForActionLiveData = model.getSubscriptionListLiveData()
-    val subscriptionListLiveData = MutableLiveData<List<Serial>>()
+    val subscriptionListLiveData = model.getSubscriptionListLiveData()
 
-    init {
-        subscriptionForActionLiveData.observeForever {
-            getSubscription()
-        }
-    }
 
-    private fun getSubscription(){
-        model.getSubscriptionList {
-            subscriptionListLiveData.postValue(it)
-        }
-    }
-
-    fun removeSubscription(id: Int){
-        model.removeSubscription(id)
+    fun removeSubscription(subscription: Subscription){
+        model.removeSubscription(subscription)
     }
 
     fun removeNotification(notification: Notification){

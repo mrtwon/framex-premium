@@ -5,10 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.Toast
-import android.widget.Toolbar
+import android.widget.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -25,7 +22,9 @@ import com.mrtwon.framex_premium.room.MovieDataBinding
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.BlurTransformation
+import kotlinx.android.synthetic.main.layout_error_load.view.*
 import kotlinx.coroutines.*
+import pl.droidsonroids.gif.GifImageView
 import java.lang.Exception
 
 class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickListener {
@@ -36,6 +35,10 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
 
     lateinit var tool_bar: MaterialToolbar
     lateinit var frame_layout: FrameLayout
+    lateinit var frame_error: FrameLayout
+    lateinit var not_found: View
+    lateinit var connect_error: View
+    lateinit var load: GifImageView
     var id: Int? = null
     var contentResponse: ContentResponse? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,9 +50,14 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
         (activity as MainActivity).hiddenBottomBar()
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        view = DataBindingUtil.inflate<FragmentAboutMovieBinding>(inflater, R.layout.fragment_about_movie, container, false)
+        view = DataBindingUtil.inflate(inflater, R.layout.fragment_about_movie, container, false)
         frame_layout = view.frameLayout
         tool_bar = view.toolBar
+        frame_error = view.frameError
+        not_found = view.notFound
+        connect_error = view.errorLoad
+        load = view.gifLoad
+        connect_error.reload.setOnClickListener(this)
 
         DRAWABLE_ON = ResourcesCompat.getDrawable(resources, R.drawable.favorite_on, requireActivity().theme)!!
         DRAWABLE_OFF = ResourcesCompat.getDrawable(resources, R.drawable.favorite_off, requireActivity().theme)!!
@@ -73,7 +81,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
 
     @DelicateCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        observerAbout()
+        observer()
         id?.let {
             observerIsFavorite(it)
             aboutVM.getAbout(it)
@@ -84,7 +92,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
     private fun observerIsFavorite(id: Int){
         aboutVM.getFavoriteLiveData(id).observe(viewLifecycleOwner, Observer {
             val favoriteIconElement = tool_bar.menu.findItem(R.id.favorite)
-            if(it == null) {
+            if(it != null) {
                 favoriteIconElement.icon = DRAWABLE_ON
             }else {
                 favoriteIconElement.icon = DRAWABLE_OFF
@@ -126,36 +134,64 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
     }
 
 
-    private fun observerAbout(){
-        aboutVM.contentData.observe(viewLifecycleOwner){
-            // data binding
-            //Log.i("self-about","[test] ${it.ru_title_lower} ${it.year}")
-            contentResponse = it
-            view.movie = MovieDataBinding(it)
+    private fun observer(){
+        aboutVM.contentData.observe(viewLifecycleOwner) {
 
-            //load poster
-            setPosterAndBackground(it.poster)
+            if (it == null) aboutVM.notFoundLiveData.postValue(true)
+            else {
+                clearVisibility()
+                frame_layout.visibility = View.VISIBLE
+
+                // data binding
+                contentResponse = it
+                view.movie = MovieDataBinding(it)
+
+                //load poster
+                setPosterAndBackground(it.poster)
+            }
+
         }
+        aboutVM.connectErrorLiveData.observe(viewLifecycleOwner){
+            clearVisibility()
+            frame_error.visibility = View.VISIBLE
+            connect_error.visibility = View.VISIBLE
+        }
+        aboutVM.notFoundLiveData.observe(viewLifecycleOwner){
+            clearVisibility()
+            frame_error.visibility = View.VISIBLE
+            not_found.visibility = View.VISIBLE
+        }
+        aboutVM.loadLiveData.observe(viewLifecycleOwner){
+            clearVisibility()
+            frame_error.visibility = View.VISIBLE
+            load.visibility = View.VISIBLE
+        }
+    }
+
+    private fun clearVisibility(){
+        frame_layout.visibility = View.GONE
+        frame_error.visibility = View.GONE
+        not_found.visibility = View.GONE
+        load.visibility = View.GONE
+        connect_error.visibility = View.GONE
     }
 
     private fun checkBlockAndStartActivity() {
-        lifecycle.coroutineScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ -> }) {
-            /*id?.let { _id ->
-                val isBlocked = aboutVM.model.checkedBlockSync(_id, "movie")
-                if (!isBlocked) {
-                    val intent = Intent(requireContext(), ActivityWebView::class.java)
-                    intent.putExtra("id", _id)
-                    intent.putExtra("content_type", "movie")
-                    startActivity(intent)
-                } else {
-                    Toast.makeText(requireContext(), "Контент не доступен", Toast.LENGTH_LONG).show()
-                }
-            }*/
-        }
+        val intent = Intent(requireContext(), ActivityWebView::class.java)
+        intent.putExtra("id", id)
+        intent.putExtra("content_type", "movie")
+        startActivity(intent)
     }
 
     override fun onClick(v: View?) {
-        (activity as MainActivity).navController.popBackStack()
+        when(v?.id){
+            R.id.reload -> {
+                if(id != null) aboutVM.getAbout(id!!)
+            }
+            else ->{
+                (activity as MainActivity).navController.popBackStack()
+            }
+        }
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {

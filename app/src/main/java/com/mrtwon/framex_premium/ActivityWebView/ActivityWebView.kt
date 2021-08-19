@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.webkit.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mrtwon.framex_premium.R
@@ -23,10 +24,14 @@ class ActivityWebView: AppCompatActivity() {
         initWebView(web_view)
         id = intent.getIntExtra("id", 0)
         contentType = intent.getStringExtra("content_type")
-        observerContent()
-        vm.getVideoLink(id!!, contentType!!)
-        vm.addRecent(id!!, contentType!!)
+        if(id != 0 && contentType != null) {
+            observerContent()
+            vm.getVideoLink(id!!, contentType!!)
+        }else{
+            Toast.makeText(this, "Не возможно найти контент", Toast.LENGTH_LONG).show()
+        }
         super.onCreate(savedInstanceState)
+
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -43,9 +48,11 @@ class ActivityWebView: AppCompatActivity() {
     }
 
     fun observerContent(){
-        vm.content.observe(this){
-            it.iframe_src = "http:${it.iframe_src}"
-            web_view.loadUrl(it.iframe_src!!)
+        vm.content.observe(this) {
+            if (it != null) {
+                it.iframe_src = "http:${it.iframe_src}"
+                web_view.loadUrl(it.iframe_src!!)
+            }
         }
     }
 
@@ -86,20 +93,6 @@ class ActivityWebView: AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        log("onStart()")
-        super.onStart()
-    }
-
-    override fun onPause() {
-        log("onPause()")
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        log("onDestroy()")
-        super.onDestroy()
-    }
 
     fun log(s: String){
         Log.i("self-webview-debug",s)

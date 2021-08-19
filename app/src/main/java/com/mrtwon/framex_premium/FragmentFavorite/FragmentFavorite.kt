@@ -27,6 +27,7 @@ class FragmentFavorite: Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.i("self-favorite","onCreateView favorite")
         val view = inflater.inflate(R.layout.fragment_favorite, container, false)
         recycler_view = view.findViewById(R.id.recycler_view)
         tv_not_found = view.findViewById(R.id.textView_favorite_not_found)
@@ -36,10 +37,43 @@ class FragmentFavorite: Fragment() {
         return view
     }
 
+    override fun onDestroyView() {
+        Log.i("self-favorite","onDestroyView() favorite")
+        super.onDestroyView()
+    }
+
     override fun onStart() {
-        (activity as MainActivity).reselectedNavigationPosition()
+        //(activity as MainActivity).reselectedNavigationPosition()
+        log("onStart()")
         super.onStart()
     }
+
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        log("onViewStateRestored()")
+        super.onViewStateRestored(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        log("onSaveInstanceState()")
+        super.onSaveInstanceState(outState)
+    }
+    override fun onResume() {
+        log("onResume()")
+        super.onResume()
+    }
+
+    override fun onStop() {
+        log("onStop()")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        log("onDestroy()")
+        super.onDestroy()
+    }
+
+
     fun observerFavorite(){
         vm.favoriteLiveData.observe(viewLifecycleOwner, Observer {
             if(it.isEmpty()){
@@ -70,6 +104,12 @@ class FragmentFavorite: Fragment() {
             poster.setOnClickListener{
                 val bundle = Bundle().apply { putInt("id", favorite.id_content) }
                 when(favorite.content_type){
+                    /*"movie" -> {
+                        (requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentFavorite_to_fragmentSearchDescription, bundle)
+                    }
+                    "tv_series" -> {
+                        (requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentFavorite_to_fragmentSearchDescription, bundle)
+                    }*/
                     "movie" -> {
                         (requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentFavorite_to_fragmentAboutMovie, bundle)
                     }
@@ -102,5 +142,8 @@ class FragmentFavorite: Fragment() {
             return listContent.size
         }
 
+    }
+    fun log(s: String){
+        Log.i("self-favorite", s)
     }
 }

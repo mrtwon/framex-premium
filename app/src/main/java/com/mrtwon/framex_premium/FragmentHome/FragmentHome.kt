@@ -21,6 +21,7 @@ import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.MainViewModel
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.room.Content
+import com.mrtwon.framex_premium.room.Recent
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
@@ -29,7 +30,7 @@ class FragmentHome: Fragment() {
     val controller by lazy { (requireActivity() as MainActivity).navController }
     lateinit var recent_rv: RecyclerView
     lateinit var card_view_recent: CardView
-    val listRecent = arrayListOf<Content>()
+    val listRecent = arrayListOf<Recent>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -38,7 +39,7 @@ class FragmentHome: Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         recent_rv = view.recycler_view_recent
         card_view_recent = view.recent_card_view
-        recent_rv.adapter = AdapterRecent(listRecent, requireContext())
+        recent_rv.adapter = AdapterRecent(listRecent)
         recent_rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         clickListener(view)
         return view
@@ -145,12 +146,12 @@ class FragmentHome: Fragment() {
         val image: ImageView = itemView.findViewById(R.id.poster)
         val contentType: TextView = itemView.findViewById(R.id.contentType)
         val contentLayout: LinearLayout = itemView.findViewById(R.id.content_layout)
-        fun bind(content: Content){
+        fun bind(recent: Recent){
             contentLayout.setOnClickListener{
                 val bundle: Bundle = Bundle().apply {
-                    putInt("id", content.id)
+                    putInt("id", recent.id_content)
                 }
-                when(content.contentType){
+                when(recent.content_type){
                     "tv_series" -> {
                         (activity as MainActivity).navController.navigate(R.id.fragmentAboutSerial, bundle)
                     }
@@ -159,20 +160,20 @@ class FragmentHome: Fragment() {
                     }
                 }
             }
-            contentType.text = when(content.contentType){
+            contentType.text = when(recent.content_type){
                 "tv_series" -> "Сериал"
                 "movie" -> "Фильм"
                 else -> "Контент"
             }
             Picasso.get()
-                .load(content.poster)
+                .load(recent.poster)
                 .into(image)
         }
     }
-    inner class AdapterRecent(val list: List<Content>,val  context: Context): RecyclerView.Adapter<ViewHolderRecent>() {
+    inner class AdapterRecent(val list: List<Recent>): RecyclerView.Adapter<ViewHolderRecent>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderRecent {
             return ViewHolderRecent(
-                LayoutInflater.from(context).inflate(R.layout.layout_recent_element, parent, false)
+                layoutInflater.inflate(R.layout.layout_recent_element, parent, false)
             )
         }
 

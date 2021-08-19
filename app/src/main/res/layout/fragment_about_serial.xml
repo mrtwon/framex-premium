@@ -10,12 +10,43 @@
             type="com.mrtwon.framex_premium.room.SerialDataBinding" />
     </data>
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <FrameLayout
+        android:id="@+id/frame_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/gif_load"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gif_load"
+            android:layout_gravity="center"
+            android:alpha="0.7"
+            tools:visibility="gone"
+            android:visibility="gone"
+            />
+        <include
+            android:id="@+id/not_found"
+            layout="@layout/layout_not_found"
+            tools:visibility="gone"
+            android:visibility="gone"
+            />
+        <include
+            android:id="@+id/error_load"
+            layout="@layout/layout_error_load"
+            tools:visibility="gone"
+            android:visibility="gone"
+            />
+    </FrameLayout>
+    <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:theme="@style/AppTheme.About"
         android:fitsSystemWindows="true"
-        >
+        android:visibility="gone">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
@@ -161,5 +192,6 @@
                     tools:text="Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин.Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин."/>
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>
+    </FrameLayout>
     </FrameLayout>
 </layout>

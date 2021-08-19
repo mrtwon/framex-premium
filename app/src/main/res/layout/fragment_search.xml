@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -53,7 +54,30 @@
         android:layout_height="330dp"
         android:alpha="0.5"
         android:src="@drawable/sherlok_stik_001"
+        android:visibility="visible"
         />
+
+        <include
+            android:id="@+id/error_load"
+            layout="@layout/layout_error_load"
+            android:visibility="gone"
+            />
+        <include
+            android:id="@+id/not_found"
+            layout="@layout/layout_not_found"
+            android:visibility="gone"
+            />
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/gif_load"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gif_load"
+            android:layout_gravity="center"
+            android:alpha="0.7"
+            tools:visibility="gone"
+            android:visibility="gone"
+            />
+
 
     </LinearLayout>
 </LinearLayout>

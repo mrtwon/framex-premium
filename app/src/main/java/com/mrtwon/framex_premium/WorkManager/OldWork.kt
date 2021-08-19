@@ -11,12 +11,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.mrtwon.framex_premium.Components.AppComponents
-import com.mrtwon.framex_premium.Components.DaggerAppComponents
+import com.mrtwon.framex_premium.components.AppComponents
+import com.mrtwon.framex_premium.components.DaggerAppComponents
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
-import com.mrtwon.framex_premium.Retrofit.VideoCdn.TvSeries.POJOVideoCdnTS
-import com.mrtwon.framex_premium.Retrofit.VideoCdn.VideoCdnApi
+import com.mrtwon.framex_premium.retrofit.VideoCdn.TvSeries.POJOVideoCdnTS
+import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.Database
 import com.mrtwon.framex_premium.room.Notification
 import java.util.*

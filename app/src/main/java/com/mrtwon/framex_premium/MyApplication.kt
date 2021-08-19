@@ -1,11 +1,11 @@
-package com.example.startandroid
+package com.mrtwon.framex_premium
 
 import android.app.Application
 import android.util.Log
 import androidx.work.*
-import com.mrtwon.framex_premium.Components.AppComponents
-import com.mrtwon.framex_premium.Components.DaggerAppComponents
+import com.mrtwon.framex_premium.components.AppComponents
 import com.mrtwon.framex_premium.WorkManager.Work
+import com.mrtwon.framex_premium.components.DaggerAppComponents
 import java.util.concurrent.TimeUnit
 
 class MyApplication: Application() {
@@ -13,7 +13,7 @@ class MyApplication: Application() {
     override fun onCreate() {
         appComponents = DaggerAppComponents.create()
         getInstance = this
-        startWorkManager()
+        //startWorkManager()
         super.onCreate()
     }
 

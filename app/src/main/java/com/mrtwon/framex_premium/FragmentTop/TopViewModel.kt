@@ -12,19 +12,80 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 
 class TopViewModel: GeneralVM() {
     val listLiveData =  MutableLiveData<List<ContentResponse>>()
+    val connectErrorLiveData = MutableLiveData<Boolean>()
+    val notFoundLiveData = MutableLiveData<Boolean>()
+    val loadLiveData = MutableLiveData<Boolean>()
+
+    private var currentPage = 0
+    private var lastPage = 0
+    private val MAX_PAGE = 5
     @DelicateCoroutinesApi
     fun getContentByGenresEnum(genres: GenresEnum, content: ContentTypeEnum){
-        log("start vm function")
-        model.getTopByGenresEnum(genres, content){
-            listLiveData.postValue(it)
-        }
+        loadLiveData.postValue(true)
+        model.getTopByGenresEnum(genres, content, 1,
+            {
+                loadLiveData.postValue(false)
+                connectErrorLiveData.postValue(it)
+            },
+            {
+                    loadLiveData.postValue(false)
+                    listLiveData.postValue(it)
+                    lastPage = if(it.isNotEmpty()) it[it.lastIndex].last_page else 0
+                    log("lastPage ${lastPage}, content ${content.toString()}")
+            }
+        )
     }
+
     @DelicateCoroutinesApi
     fun getContentByCollectionEnum(collection: CollectionContentEnum, content: ContentTypeEnum){
-        /*model.getTopByCollectionEnum(collection, content){
-            listLiveData.postValue(it)
-        }*/
+        loadLiveData.postValue(true)
+        model.getTopByCollectionEnum(collection, content, 1,
+            {
+                loadLiveData.postValue(false)
+                lastPage = if(it.isNotEmpty()) it[it.lastIndex].last_page else 0
+                listLiveData.postValue(it)
+            },
+            {
+                loadLiveData.postValue(false)
+                connectErrorLiveData.postValue(true)
+            })
     }
+
+    @DelicateCoroutinesApi
+    fun giveNextPageCollection(collection: CollectionContentEnum, content: ContentTypeEnum){
+        if(lastPage > currentPage && MAX_PAGE > currentPage){
+            currentPage++
+
+            model.getTopByCollectionEnum(collection, content, currentPage,
+                {
+                    listLiveData.postValue(it)
+                },
+                {
+                    connectErrorLiveData.postValue(it)
+                }
+            )
+        }
+    }
+
+
+    @DelicateCoroutinesApi
+    fun giveNextPageGenres(genres: GenresEnum, content: ContentTypeEnum){
+        if(lastPage > currentPage && MAX_PAGE > currentPage){
+            log("next if, content ${content.toString()}")
+            currentPage++
+
+            model.getTopByGenresEnum(genres, content, currentPage,
+                {
+                    connectErrorLiveData.postValue(it)
+                },
+                {
+                    listLiveData.postValue(it)
+                    lastPage = it[it.lastIndex].last_page
+                }
+            )
+        }
+    }
+
     private fun log(s: String){
         Log.i("self-top-vm",s)
     }

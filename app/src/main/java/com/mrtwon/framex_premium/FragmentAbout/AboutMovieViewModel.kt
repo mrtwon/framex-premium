@@ -2,22 +2,31 @@ package com.mrtwon.framex_premium.FragmentAbout
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.example.startandroid.MyApplication
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.ContentResponse.Movie
 import com.mrtwon.framex_premium.GeneralVM
 import com.mrtwon.framex_premium.room.Favorite
-import com.mrtwon.framex_premium.room.MovieWithGenres
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 class AboutMovieViewModel: GeneralVM() {
-    val contentData = MutableLiveData<Movie>()
+    val contentData = MutableLiveData<Movie?>()
+    val notFoundLiveData = MutableLiveData<Boolean>()
+    val connectErrorLiveData = MutableLiveData<Boolean>()
+    val loadLiveData = MutableLiveData<Boolean>()
+
     @DelicateCoroutinesApi
     fun getAbout(id: Int){
-        model.getAboutMovie(id){
-            contentData.postValue(it)
-        }
+        loadLiveData.postValue(true)
+        model.getAboutMovie(id,
+            {
+                loadLiveData.postValue(false)
+                contentData.postValue(it)
+            },
+            {
+                loadLiveData.postValue(false)
+                connectErrorLiveData.postValue(it)
+            }
+        )
     }
 
     fun getFavoriteLiveData(id: Int): LiveData<Favorite>{

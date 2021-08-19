@@ -82,15 +82,36 @@
             app:popEnterAnim="@anim/slide_in_two"
             app:popExitAnim="@anim/slide_out_two"
             />
+        <action
+            android:id="@+id/action_fragmentFavorite_to_fragmentSearchDescription"
+            app:destination="@id/fragmentSearchDescription" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSearch"
         android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearch"
-        android:label="FragmentSearch" />
+        android:label="FragmentSearch" >
+        <action
+            android:id="@+id/action_fragmentSearch_to_fragmentAboutMovie"
+            app:destination="@id/fragmentAboutMovie" />
+        <action
+            android:id="@+id/action_fragmentSearch_to_fragmentAboutSerial"
+            app:destination="@id/fragmentAboutSerial" />
+        <action
+            android:id="@+id/action_fragmentSearch_to_fragmentSearchDescription"
+            app:destination="@id/fragmentSearchDescription" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentSearchDescription"
         android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearchDescription"
-        android:label="FragmentSearchDescription" />
+        android:label="FragmentSearchDescription" >
+        <action
+            android:id="@+id/action_fragmentSearchDescription_to_fragmentAboutMovie"
+            app:destination="@id/fragmentAboutMovie" />
+        <action
+            android:id="@+id/action_fragmentSearchDescription_to_fragmentAboutSerial"
+            app:destination="@id/fragmentAboutSerial" />
+
+    </fragment>
     <fragment
         android:id="@+id/fragmentSubscription"
         android:name="com.mrtwon.framex_premium.FragmentSubscription.FragmentSubscription"

@@ -23,16 +23,22 @@ import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.databinding.FragmentAboutSerialBinding
+import com.mrtwon.framex_premium.room.MovieDataBinding
 import com.mrtwon.framex_premium.room.SerialDataBinding
 import com.mrtwon.framex_premium.room.Subscription
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.BlurTransformation
+import kotlinx.android.synthetic.main.layout_error_load.view.*
 import kotlinx.coroutines.*
+import pl.droidsonroids.gif.GifImageView
 import java.lang.Exception
 
 class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickListener {
     val aboutVM: AboutSerialViewModel by lazy { ViewModelProvider(this).get(AboutSerialViewModel::class.java) }
+    var id: Int? = null
+    var contentResponse: ContentResponse? = null
+
     lateinit var buttom_subscription: Button
     lateinit var DRAWABLE_ON: Drawable
     lateinit var DRAWABLE_OFF: Drawable
@@ -40,8 +46,11 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
 
     lateinit var tool_bar: MaterialToolbar
     lateinit var frame_layout: FrameLayout
-    var id: Int? = null
-    var contentResponse: ContentResponse? = null
+    lateinit var frame_error: FrameLayout
+    lateinit var not_found: View
+    lateinit var connect_error: View
+    lateinit var load: GifImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         id = requireArguments().getInt("id")
         super.onCreate(savedInstanceState)
@@ -52,13 +61,19 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
-        view = DataBindingUtil.inflate<FragmentAboutSerialBinding>(
+        view = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_about_serial,
             container,
             false
         )
         frame_layout = view.frameLayout
+        frame_error = view.frameError
+        not_found = view.notFound
+        connect_error = view.errorLoad
+        load = view.gifLoad
+        connect_error.reload.setOnClickListener(this)
+
         tool_bar = view.toolBar
         buttom_subscription = view.subscription
         DRAWABLE_ON = ResourcesCompat.getDrawable(
@@ -87,12 +102,14 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
 
         @DelicateCoroutinesApi
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            observerAbout()
+            observer()
             id?.let {
                 observerSubscription(aboutVM.initSubscriptionLiveData(it))
                 observerIsFavorite(it)
                 aboutVM.getAbout(it)
-                buttom_subscription.setOnClickListener{ aboutVM.subscriptionAction(id!!)}
+                buttom_subscription.setOnClickListener{
+                    if(contentResponse != null) aboutVM.subscriptionAction(contentResponse!!)
+                }
             }
             super.onViewCreated(view, savedInstanceState)
         }
@@ -121,7 +138,7 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
     private fun observerIsFavorite(id: Int){
         aboutVM.getFavoriteLiveData(id).observe(viewLifecycleOwner, Observer {
             val favoriteIconElement = tool_bar.menu.findItem(R.id.favorite)
-            if(it == null) {
+            if(it != null) {
                 favoriteIconElement.icon = DRAWABLE_ON
             }else {
                 favoriteIconElement.icon = DRAWABLE_OFF
@@ -129,19 +146,47 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         })
     }
 
-        private fun observerAbout() {
-            aboutVM.contentData.observe(viewLifecycleOwner) {
-                if(it != null){
-                    contentResponse = it
-                    // data binding
-                    view.serial = SerialDataBinding(it)
+    private fun observer(){
+                aboutVM.contentData.observe(viewLifecycleOwner) {
 
-                    //load poster
-                    setPosterAndBackground(it.poster)
+                    if (it == null) aboutVM.notFoundLiveData.postValue(true)
+                    else {
+                        clearVisibility()
+                        frame_layout.visibility = View.VISIBLE
+
+                        // data binding
+                        contentResponse = it
+                        view.serial = SerialDataBinding(it)
+
+                        //load poster
+                        setPosterAndBackground(it.poster)
+                    }
 
                 }
+                aboutVM.connectErrorLiveData.observe(viewLifecycleOwner){
+                    clearVisibility()
+                    frame_error.visibility = View.VISIBLE
+                    connect_error.visibility = View.VISIBLE
+                }
+                aboutVM.notFoundLiveData.observe(viewLifecycleOwner){
+                    clearVisibility()
+                    frame_error.visibility = View.VISIBLE
+                    not_found.visibility = View.VISIBLE
+                }
+                aboutVM.loadLiveData.observe(viewLifecycleOwner){
+                    clearVisibility()
+                    frame_error.visibility = View.VISIBLE
+                    load.visibility = View.VISIBLE
+                }
             }
-        }
+
+    private fun clearVisibility(){
+        frame_layout.visibility = View.GONE
+        frame_error.visibility = View.GONE
+        not_found.visibility = View.GONE
+        load.visibility = View.GONE
+        connect_error.visibility = View.GONE
+    }
 
 
         fun loadBackgroundPoster(url: String?){
@@ -200,9 +245,16 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         }
 
 
-        override fun onClick(v: View?) {
-            (activity as MainActivity).navController.popBackStack()
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.reload -> {
+                if(id != null) aboutVM.getAbout(id!!)
+            }
+            else ->{
+                (activity as MainActivity).navController.popBackStack()
+            }
         }
+    }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when(item?.itemId){

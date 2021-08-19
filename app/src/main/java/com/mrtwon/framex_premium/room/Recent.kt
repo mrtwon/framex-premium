@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 @Entity
 class Recent {
     @PrimaryKey @ColumnInfo(name = "id") var id: Int? = null
-    @ColumnInfo(name = "id_ref") var idRef: Int? = null
-    @ColumnInfo(name = "contentType") var contentType: String? = null
-    @ColumnInfo(name = "time") var time: Int? = null
+    @ColumnInfo(name = "id_content") var id_content = 0
+    @ColumnInfo(name = "content_type") var content_type: String = ""
+    @ColumnInfo(name = "poster") var poster: String? = null
+    @ColumnInfo(name = "time") var time: Int = 0
 }

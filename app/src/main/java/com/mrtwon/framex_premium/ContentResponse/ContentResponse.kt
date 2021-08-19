@@ -17,4 +17,6 @@ open class ContentResponse {
    var imdb_rating: String? = null
    var kinopoisk_raintg: String? = null
 
+   var last_page: Int = 0
+   var current_page: Int = 0
 }
