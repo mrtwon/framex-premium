@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,10 @@ import com.google.android.material.textfield.TextInputEditText
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
+import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerial
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import kotlinx.android.synthetic.main.fragment_about_movie.view.*
 import kotlinx.android.synthetic.main.fragment_search.view.recycler_view
 import kotlinx.android.synthetic.main.fragment_search.view.text_input
@@ -40,8 +45,9 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     lateinit var load: GifImageView
     val list = arrayListOf<ContentResponse>()
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        log("onCreateView() | ${vm.searchQueryDescription.value} | size ${vm.searchContent.value?.size}")
+        log("onCreateView()")
         val view = inflater.inflate(R.layout.fragment_search_description, container, false)
         rv = view.recycler_view
         text_input = view.text_input
@@ -50,7 +56,11 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         connect_error.reload.setOnClickListener(this)
         load = view.findViewById(R.id.gif_load)
         welcome_search = view.welcome_image
-        rv.adapter = SearchAdapter(list)
+        rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(SearchAdapter(list))).apply {
+            setDuration(200)
+            setFirstOnly(false)
+        }
+        rv.itemAnimator = FadeInAnimator()
         rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         view.chip_one.setOnClickListener(this)
         view.chip_two.setOnClickListener(this)
@@ -63,9 +73,6 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observerTextInput()
         observerSearch()
-        vm.searchQueryDescription.value?.let {
-            vm.searchQueryDescription.postValue(it)
-        }
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -73,6 +80,8 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     fun observerTextInput(){
         text_input.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT){
+                list.clear()
+                rv.adapter?.notifyDataSetChanged()
                 vm.searchQueryDescription.postValue(v.text.toString())
                 return@setOnEditorActionListener true
             }
@@ -80,14 +89,18 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         }
     }
     fun observerSearch(){
-        vm.searchContent.observe(viewLifecycleOwner) {
+        vm.searchContent.observe(viewLifecycleOwner){
             if (it.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
                 clearVisibility()
-                list.clear()
-                list.addAll(it)
-                rv.adapter?.notifyDataSetChanged()
-                rv.visibility = View.VISIBLE
+                if(it.isEmpty() && list.isEmpty()){
+                    vm.notFoundLiveData.postValue(true)
+                }else{
+                    list.addAll(it)
+                    rv.adapter?.notifyDataSetChanged()
+                    rv.visibility = View.VISIBLE
+
+                }
             }
         }
         vm.connectErrorLiveData.observe(viewLifecycleOwner){
@@ -154,6 +167,10 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if(position == contentList.size-1){
+                vm.nextPageDescription()
+            }
+            log("position ${position}")
             holder.bind(contentList[position])
         }
 
@@ -163,12 +180,36 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
 
     }
 
+
+    override fun onDestroyView() {
+        log("onDestroyView()")
+        super.onDestroyView()
+    }
+
+    override fun onStop() {
+        log("onStop()")
+        super.onStop()
+    }
+
+    override fun onPause() {
+        log("onPause()")
+        super.onPause()
+    }
+
+    override fun onResume() {
+        log("onResume()")
+        super.onResume()
+    }
+
+
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.reload -> {
                 vm.searchQueryDescription.postValue(vm.searchQueryDescription.value)
             }
             else -> {
+                list.clear()
+                rv.adapter?.notifyDataSetChanged()
                 text_input.setText((v as Chip).text)
                 vm.searchQueryDescription.postValue((v as Chip).text.toString())
             }

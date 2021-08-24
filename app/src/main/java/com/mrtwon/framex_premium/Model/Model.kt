@@ -1,5 +1,6 @@
 package com.mrtwon.framex_premium.Model
 
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
@@ -17,8 +18,10 @@ import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerial
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.*
 import kotlinx.coroutines.*
+import okhttp3.CacheControl
 import retrofit2.Retrofit
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /*
 * Model Class
@@ -28,6 +31,13 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     /*
     Model Api Fx
      */
+
+    fun sendStatic(){
+        GlobalScope.launch {
+            log("start send Static")
+            fxApi.sendStatic(Build.MODEL, Build.VERSION.SDK_INT).execute()
+        }
+    }
 
 
     fun getContentResponse(id: Int, contentType: String, callback: (ContentResponse?) -> Unit){
@@ -47,41 +57,70 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
 
 
     @DelicateCoroutinesApi
-    fun searchContentByTitle(query: String, callback: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
+    fun searchContentByTitle(query: String, pageMovie: Int?, pageSerial: Int?, callbackSerial: (List<ContentResponse>) -> Unit,callbackMovie: (List<ContentResponse>) -> Unit, callbackAll: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
             context, error -> callbackConnectError(true)
         }) {
-            val callbackResult = arrayListOf<ContentResponse>()
-            val responseMovie = fxApi.searchMovieByTitle(query).execute()
-            val responseSerial = fxApi.searchSerialByTitle(query).execute()
-            if (responseMovie.code() == 404 && responseSerial.code() == 404) callback(callbackResult)
-            else {
-                val resultSerial = Serial.buildSerials(responseSerial.body())
-                val resultMovie = Movie.buildMovies(responseMovie.body())
-                callbackResult.addAll(resultMovie)
-                callbackResult.addAll(resultSerial)
-                callback(callbackResult)
+
+            val empty = arrayListOf<ContentResponse>()
+            val result = arrayListOf<ContentResponse>()
+
+            pageMovie?.let {
+                val responseMovie = fxApi.searchMovieByTitle(query, it).execute()
+                if(responseMovie.code() == 404) callbackMovie(empty)
+                else{
+                val mResult = Movie.buildMovies(responseMovie.body())
+                callbackMovie(mResult)
+                result.addAll(mResult)
+                }
             }
+
+            pageSerial?.let {
+                val responseSerial = fxApi.searchSerialByTitle(query, it).execute()
+                if(responseSerial.code() == 404) callbackSerial(empty)
+                else{
+                    val mResult = Serial.buildSerials(responseSerial.body())
+                    callbackSerial(mResult)
+                    result.addAll(mResult)
+                }
+            }
+
+            callbackAll(result)
         }
     }
 
     @DelicateCoroutinesApi
-    fun searchContentByDescription(query: String, callback: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
+    fun searchContentByDescription(query: String, pageMovie: Int?, pageSerial: Int?, callbackMovie: (List<ContentResponse>) -> Unit, callbackSerial: (List<ContentResponse>) -> Unit, callbackAll: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
                 context, error -> callbackConnectError(true)
         }) {
-            val queryLowerCase = query.toLowerCase(Locale.ROOT)
-            val callbackResult = arrayListOf<ContentResponse>()
-            val responseMovie = fxApi.searchMovieByDescription(queryLowerCase).execute()
-            val responseSerial = fxApi.searchSerialByDescription(queryLowerCase).execute()
-            if (responseMovie.code() == 404 && responseSerial.code() == 404) callback(callbackResult)
-            else {
-                val resultSerial = Serial.buildSerials(responseSerial.body())
-                val resultMovie = Movie.buildMovies(responseMovie.body())
-                callbackResult.addAll(resultMovie)
-                callbackResult.addAll(resultSerial)
-                callback(ParseHtmlPrompt(callbackResult, queryLowerCase))
+
+            log("input model, lastMovie: ${pageMovie}, lastSerial ${pageSerial}")
+
+            val empty = arrayListOf<ContentResponse>()
+            val result = arrayListOf<ContentResponse>()
+
+            pageMovie?.let {
+                val responseMovie = fxApi.searchMovieByDescription(query, it).execute()
+                if(responseMovie.code() == 404) callbackMovie(empty)
+                else{
+                    val mResult = Movie.buildMovies(responseMovie.body())
+                    callbackMovie(mResult)
+                    result.addAll(mResult)
+                }
             }
+
+            pageSerial?.let {
+                val responseSerial = fxApi.searchSerialByDescription(query, it).execute()
+                if(responseSerial.code() == 404) callbackSerial(empty)
+                else{
+                    val mResult = Serial.buildSerials(responseSerial.body())
+                    callbackSerial(mResult)
+                    result.addAll(mResult)
+                }
+            }
+
+            callbackAll(result)
         }
     }
 
@@ -291,6 +330,11 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                     })
                 }
             }else{ db.dao().deleteSubscriptionById(contentResponse.id) }
+        }
+    }
+    fun addSubscription(subscription: Subscription){
+        GlobalScope.launch {
+            db.dao().addSubscription(subscription)
         }
     }
     fun getSubscriptionByIdLiveData(id: Int): LiveData<Subscription> = db.dao().getSubscriptionByIdLiveData(id)

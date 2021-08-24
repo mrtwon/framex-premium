@@ -1,15 +1,18 @@
 package com.mrtwon.framex_premium.FragmentTop
 
+import android.animation.Animator
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewPropertyAnimatorListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +28,11 @@ import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
+import jp.wasabeef.recyclerview.animators.holder.AnimateViewHolder
 import kotlinx.android.synthetic.main.recyclerview_top_element.view.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import pl.droidsonroids.gif.GifImageView
@@ -64,13 +72,17 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         log("onCreateView")
         val view = inflater.inflate(R.layout.recyclerview_top_element, container, false)
         rv = view.recycler_view
-        rv.adapter = Adapter(listContent)
+        rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(Adapter(listContent))).apply {
+            setDuration(700)
+            setFirstOnly(false)
+        }
         gif_load = view.findViewById(R.id.gif_load)
         connect_error = view.findViewById(R.id.error_load)
         not_found = view.findViewById(R.id.not_found)
         reload = view.findViewById(R.id.reload)
         reload.setOnClickListener(this)
         rv.layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
+        rv.itemAnimator = FadeInAnimator()
         observer()
         if(genres != null){
             vm.getContentByGenresEnum(genres!!, contentType)
@@ -102,8 +114,10 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
                 vm.notFoundLiveData.postValue(true)
             } else {
                 clearVisibility()
-                listContent.addAll(it)
-                rv.adapter?.notifyDataSetChanged()
+                for(elem in it){
+                    listContent.add(listContent.lastIndex+1, elem)
+                    rv.adapter?.notifyItemInserted(listContent.lastIndex)
+                }
                 rv.visibility = View.VISIBLE
             }
         }
@@ -137,7 +151,7 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         connect_error.visibility = View.GONE
         gif_load.visibility = View.GONE
     }
-    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), AnimateViewHolder{
         lateinit var content_layout: LinearLayout
         lateinit var poster: ImageView
         lateinit var rating_kp: TextView
@@ -177,6 +191,34 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
             }
 
         }
+
+
+        override fun preAnimateRemoveImpl(holder: RecyclerView.ViewHolder) {
+            // do something
+        }
+
+        override fun animateRemoveImpl(holder: RecyclerView.ViewHolder, listener: Animator.AnimatorListener) {
+            itemView.animate().apply {
+                translationY(-itemView.height * 0.3f)
+                alpha(0f)
+                duration = 300
+                setListener(listener)
+            }.start()
+        }
+
+        override fun preAnimateAddImpl(holder: RecyclerView.ViewHolder) {
+            itemView.setTranslationY(-itemView.height * 0.3f)
+            itemView.setAlpha(0f)
+        }
+
+        override fun animateAddImpl(holder: RecyclerView.ViewHolder, listener: Animator.AnimatorListener) {
+            itemView.animate().apply {
+                translationY(0f)
+                alpha(1f)
+                duration = 300
+                setListener(listener)
+            }.start()
+        }
     }
     inner class Adapter(val contentList: List<ContentResponse>): RecyclerView.Adapter<ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -185,6 +227,7 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            log("get position ${position}")
             if(position == contentList.size-1){
                 if(genres != null) vm.giveNextPageGenres(genres!!, contentType)
                 else if(collection != null) vm.giveNextPageCollection(collection!!, contentType)
@@ -193,6 +236,7 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         }
 
         override fun getItemCount(): Int {
+            log("size count - ${contentList.size}")
             return contentList.size
         }
     }

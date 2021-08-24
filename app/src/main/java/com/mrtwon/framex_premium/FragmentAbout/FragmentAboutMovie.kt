@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.constraintlayout.solver.widgets.Helper
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -14,7 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
+import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
+import com.mrtwon.framex_premium.Helper.HelperFunction
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.databinding.FragmentAboutMovieBinding
@@ -59,8 +62,8 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
         load = view.gifLoad
         connect_error.reload.setOnClickListener(this)
 
-        DRAWABLE_ON = ResourcesCompat.getDrawable(resources, R.drawable.favorite_on, requireActivity().theme)!!
-        DRAWABLE_OFF = ResourcesCompat.getDrawable(resources, R.drawable.favorite_off, requireActivity().theme)!!
+        DRAWABLE_ON = ResourcesCompat.getDrawable(resources, R.drawable.test_favorite_on, requireActivity().theme)!!
+        DRAWABLE_OFF = ResourcesCompat.getDrawable(resources, R.drawable.test_favorite_off, requireActivity().theme)!!
 
         view.box.background = ResourcesCompat.getDrawable(resources, R.drawable.cornet_view_about, requireActivity().theme)
 
@@ -183,6 +186,16 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
         startActivity(intent)
     }
 
+    private fun sharedContent(){
+        id?.let {
+            val deepLinkShared = HelperFunction.buildDeepLink(ContentTypeEnum.MOVIE, it)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.setType("text/plain")
+            intent.putExtra(Intent.EXTRA_TEXT, deepLinkShared)
+            startActivity(Intent(intent))
+        }
+    }
+
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.reload -> {
@@ -198,6 +211,9 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
         when(item?.itemId){
             R.id.favorite -> {
                 contentResponse?.let {aboutVM.favoriteAction(it)}
+            }
+            R.id.shared -> {
+                sharedContent()
             }
         }
         return true

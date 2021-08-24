@@ -1,11 +1,16 @@
 package com.mrtwon.framex_premium
 
 import android.app.Application
+import android.net.wifi.WifiManager
+import android.os.Build
+import android.text.format.Formatter
 import android.util.Log
 import androidx.work.*
+import com.google.firebase.FirebaseApp
 import com.mrtwon.framex_premium.components.AppComponents
 import com.mrtwon.framex_premium.WorkManager.Work
 import com.mrtwon.framex_premium.components.DaggerAppComponents
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MyApplication: Application() {
@@ -13,7 +18,8 @@ class MyApplication: Application() {
     override fun onCreate() {
         appComponents = DaggerAppComponents.create()
         getInstance = this
-        //startWorkManager()
+        startWorkManager()
+        FirebaseApp.initializeApp(this)
         super.onCreate()
     }
 
@@ -36,6 +42,10 @@ class MyApplication: Application() {
 
         }
     }
+    fun sendStatic(){
+        appComponents.getModel().sendStatic()
+    }
+
     companion object{
         lateinit var getInstance: MyApplication
     }

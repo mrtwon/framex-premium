@@ -2,6 +2,7 @@ package com.mrtwon.framex_premium.FragmentSubscription
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
 import com.mrtwon.framex_premium.MainActivity
+import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.room.Notification
 import com.mrtwon.framex_premium.room.Subscription
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.fragment_subscription.view.*
 
 class FragmentSubscription:  Fragment(){
     val vm: SubscriptionVM by lazy { ViewModelProvider(this).get(SubscriptionVM::class.java) }
@@ -86,6 +89,8 @@ class FragmentSubscription:  Fragment(){
         }
 
     }
+
+
 
     private fun showStatusWorkManager(){
         val instance = WorkManager.getInstance(requireContext())

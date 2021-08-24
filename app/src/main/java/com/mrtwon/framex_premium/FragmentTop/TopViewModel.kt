@@ -16,7 +16,7 @@ class TopViewModel: GeneralVM() {
     val notFoundLiveData = MutableLiveData<Boolean>()
     val loadLiveData = MutableLiveData<Boolean>()
 
-    private var currentPage = 0
+    private var currentPage = 1
     private var lastPage = 0
     private val MAX_PAGE = 5
     @DelicateCoroutinesApi

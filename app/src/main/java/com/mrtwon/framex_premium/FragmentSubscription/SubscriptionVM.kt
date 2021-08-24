@@ -10,6 +10,9 @@ class SubscriptionVM: GeneralVM() {
     val subscriptionListLiveData = model.getSubscriptionListLiveData()
 
 
+    fun addSubscription(subscription: Subscription){
+        model.addSubscription(subscription)
+    }
     fun removeSubscription(subscription: Subscription){
         model.removeSubscription(subscription)
     }

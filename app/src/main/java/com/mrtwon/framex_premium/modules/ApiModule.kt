@@ -5,10 +5,12 @@ import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
 import com.github.mrtwon.library.IgnoreCode
 import com.github.mrtwon.library.XmlParse
 import com.github.mrtwon.library.XmlParseBuilder
+import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.retrofit.testPOJO.FramexApi
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import dagger.Module
 import dagger.Provides
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -65,6 +67,7 @@ class ApiModule {
         return OkHttpClient().newBuilder()
             .readTimeout(2, TimeUnit.MINUTES)
             .connectTimeout(2, TimeUnit.MINUTES)
+            .cache(Cache(MyApplication.getInstance.cacheDir, 20 * 1024 * 1024 ))
             .build()
     }
 }

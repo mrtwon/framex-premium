@@ -20,8 +20,10 @@
                 />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 <androidx.appcompat.widget.Toolbar
+    android:id="@+id/tool_bar"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
     app:title="FrameX"
+    app:menu="@menu/toolbar_home"
     />
 </com.google.android.material.appbar.AppBarLayout>

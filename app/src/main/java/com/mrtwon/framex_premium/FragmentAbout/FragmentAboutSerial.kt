@@ -19,7 +19,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
+import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
+import com.mrtwon.framex_premium.Helper.HelperFunction
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.databinding.FragmentAboutSerialBinding
@@ -78,12 +80,12 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         buttom_subscription = view.subscription
         DRAWABLE_ON = ResourcesCompat.getDrawable(
             resources,
-            R.drawable.favorite_on,
+            R.drawable.test_favorite_on,
             requireActivity().theme
         )!!
         DRAWABLE_OFF = ResourcesCompat.getDrawable(
             resources,
-            R.drawable.favorite_off,
+            R.drawable.test_favorite_off,
             requireActivity().theme
         )!!
 
@@ -245,6 +247,16 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         }
 
 
+    private fun sharedContent(){
+        id?.let {
+            val deepLinkShared = HelperFunction.buildDeepLink(ContentTypeEnum.SERIAL, it)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.setType("text/plain")
+            intent.putExtra(Intent.EXTRA_TEXT, deepLinkShared)
+            startActivity(Intent(intent))
+        }
+    }
+
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.reload -> {
@@ -260,6 +272,9 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         when(item?.itemId){
             R.id.favorite -> {
                 contentResponse?.let {aboutVM.favoriteAction(it)}
+            }
+            R.id.shared -> {
+                sharedContent()
             }
         }
         return true

@@ -108,7 +108,7 @@
             android:textSize="19sp"
             android:gravity="center"
             android:layout_margin="10dp"
-            android:visibility="gone"
+            android:visibility="visible"
             />
         </FrameLayout>
     </LinearLayout>

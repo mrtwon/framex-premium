@@ -1,6 +1,7 @@
 package com.mrtwon.framex_premium.FragmentSearch
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,13 +10,18 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import kotlinx.android.synthetic.main.fragment_search.view.*
 import kotlinx.android.synthetic.main.layout_error_load.*
 import kotlinx.android.synthetic.main.layout_error_load.view.*
@@ -34,6 +40,9 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     lateinit var connect_error: View
     lateinit var load: GifImageView
     val list = arrayListOf<ContentResponse>()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         rv = view.recycler_view
@@ -43,7 +52,11 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         connect_error = view.error_load
         load = view.gif_load
         connect_error.reload.setOnClickListener(this)
-        rv.adapter = SearchAdapter(list)
+        rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(SearchAdapter(list))).apply {
+            setDuration(200)
+            setFirstOnly(false)
+        }
+        rv.itemAnimator = FadeInAnimator()
         rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         view.btn_search_description.setOnClickListener(this)
         return view
@@ -53,9 +66,6 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observerTextInput()
         observerSearch()
-        vm.searchQuery.value?.let {
-            vm.searchQuery.postValue(it)
-        }
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -66,6 +76,8 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         text_input.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 Log.i("self-search","string query: ${v.text.toString()}")
+                list.clear()
+                rv.adapter?.notifyDataSetChanged()
                 vm.searchQuery.postValue(v.text.toString())
                 return@setOnEditorActionListener true
             }else{
@@ -76,14 +88,12 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     }
 
     fun observerSearch(){
-        vm.searchContent.observe(viewLifecycleOwner) {
-            if (it.isEmpty()) vm.notFoundLiveData.postValue(true)
+        vm.searchContent.observe(viewLifecycleOwner){
+            if (it.isEmpty() && list.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
                 clearVisibility()
-                rv.visibility = View.VISIBLE
-                list.clear()
                 list.addAll(it)
-                rv.adapter?.notifyDataSetChanged()
+                rv.visibility = View.VISIBLE
             }
         }
         vm.connectErrorLiveData.observe(viewLifecycleOwner){
@@ -125,7 +135,7 @@ class FragmentSearch: Fragment(), View.OnClickListener {
                 val bundle = Bundle().apply {
                     putInt("id", content.id)
                 }
-                when(content.contentType){
+            when(content.contentType){
                     "tv_series" -> {
                         (requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentSearch_to_fragmentAboutSerial, bundle)
                     }
@@ -143,6 +153,10 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if(position == contentList.size-1){
+                vm.nextPageTitle()
+            }
+            log("position ${position}")
             holder.bind(contentList[position])
         }
 
@@ -150,6 +164,25 @@ class FragmentSearch: Fragment(), View.OnClickListener {
             return contentList.size
         }
 
+    }
+
+    override fun onDestroyView() {
+        log("onDestroyView()")
+        super.onDestroyView()
+    }
+    override fun onStop() {
+        log("onStop()")
+        super.onStop()
+    }
+
+    override fun onPause() {
+        log("onPause()")
+        super.onPause()
+    }
+
+    override fun onResume() {
+        log("onResume()")
+        super.onResume()
     }
 
     override fun onClick(v: View?) {
@@ -165,4 +198,5 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     fun log(s: String){
         Log.i("self-search",s)
     }
+
 }

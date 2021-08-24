@@ -15,11 +15,11 @@
     android:enabled="true"
     android:title="Найти"
     android:icon="@drawable/ic_search"/>
-<!--<item
-    android:id="@+id/update"
+<item
+    android:id="@+id/subscription"
     android:enabled="true"
-    android:title="Обновить"
-    android:icon="@drawable/ic_update"/>-->
+    android:title="Подписки"
+    android:icon="@drawable/ic_subscription"/>
 
 
 </menu>

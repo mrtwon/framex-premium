@@ -16,22 +16,14 @@
             app:popExitAnim="@anim/slide_out_two"
         />
         <action
-            android:id="@+id/action_fragmentHome_to_fragmentFavorite"
-            app:destination="@id/fragmentFavorite"
-            app:enterAnim="@anim/slide_in_one"
-            app:exitAnim="@anim/slide_out_one"
-            app:popEnterAnim="@anim/slide_in_two"
-            app:popExitAnim="@anim/slide_out_two"
-            />
-        <action
-            android:id="@+id/action_fragmentHome_to_fragmentSearch"
-            app:destination="@id/fragmentSearch" />
-        <action
             android:id="@+id/action_fragmentHome_to_fragmentSearchDescription"
             app:destination="@id/fragmentSearchDescription" />
         <action
             android:id="@+id/action_fragmentHome_to_fragmentSubscription"
             app:destination="@id/fragmentSubscription" />
+        <action
+            android:id="@+id/action_fragmentHome_to_fragmentTest"
+            app:destination="@id/fragmentTest" />
     </fragment>
     <fragment
         android:id="@+id/fragmentTop"
@@ -67,16 +59,12 @@
         android:name="com.mrtwon.framex_premium.FragmentFavorite.FragmentFavorite"
         android:label="FragmentFavorite" >
         <action
-            android:id="@+id/action_fragmentFavorite_to_fragmentAboutMovie"
-            app:destination="@id/fragmentAboutMovie"
-            app:enterAnim="@anim/slide_in_one"
-            app:exitAnim="@anim/slide_out_one"
-            app:popEnterAnim="@anim/slide_in_two"
-            app:popExitAnim="@anim/slide_out_two"
-            />
-        <action
             android:id="@+id/action_fragmentFavorite_to_fragmentAboutSerial"
             app:destination="@id/fragmentAboutSerial"
+            />
+        <action
+            android:id="@+id/action_fragmentFavorite_to_fragmentAboutMovie"
+            app:destination="@id/fragmentAboutMovie"
             app:enterAnim="@anim/slide_in_one"
             app:exitAnim="@anim/slide_out_one"
             app:popEnterAnim="@anim/slide_in_two"
@@ -92,10 +80,20 @@
         android:label="FragmentSearch" >
         <action
             android:id="@+id/action_fragmentSearch_to_fragmentAboutMovie"
-            app:destination="@id/fragmentAboutMovie" />
+            app:destination="@id/fragmentAboutMovie"
+            app:enterAnim="@anim/slide_in_one"
+            app:exitAnim="@anim/slide_out_one"
+            app:popEnterAnim="@anim/slide_in_two"
+            app:popExitAnim="@anim/slide_out_two"
+            />
         <action
             android:id="@+id/action_fragmentSearch_to_fragmentAboutSerial"
-            app:destination="@id/fragmentAboutSerial" />
+            app:destination="@id/fragmentAboutSerial"
+            app:enterAnim="@anim/slide_in_one"
+            app:exitAnim="@anim/slide_out_one"
+            app:popEnterAnim="@anim/slide_in_two"
+            app:popExitAnim="@anim/slide_out_two"
+            />
         <action
             android:id="@+id/action_fragmentSearch_to_fragmentSearchDescription"
             app:destination="@id/fragmentSearchDescription" />
@@ -106,14 +104,32 @@
         android:label="FragmentSearchDescription" >
         <action
             android:id="@+id/action_fragmentSearchDescription_to_fragmentAboutMovie"
-            app:destination="@id/fragmentAboutMovie" />
+            app:destination="@id/fragmentAboutMovie"
+            app:enterAnim="@anim/slide_in_one"
+            app:exitAnim="@anim/slide_out_one"
+            app:popEnterAnim="@anim/slide_in_two"
+            app:popExitAnim="@anim/slide_out_two"
+            />
         <action
             android:id="@+id/action_fragmentSearchDescription_to_fragmentAboutSerial"
-            app:destination="@id/fragmentAboutSerial" />
+            app:destination="@id/fragmentAboutSerial"
+            app:enterAnim="@anim/slide_in_one"
+            app:exitAnim="@anim/slide_out_one"
+            app:popEnterAnim="@anim/slide_in_two"
+            app:popExitAnim="@anim/slide_out_two"
+            />
 
     </fragment>
     <fragment
         android:id="@+id/fragmentSubscription"
         android:name="com.mrtwon.framex_premium.FragmentSubscription.FragmentSubscription"
         android:label="FragmentSubscription" />
+    <fragment
+        android:id="@+id/fragmentTest"
+        android:name="com.mrtwon.framex_premium.FragmentTest"
+        android:label="FragmentTest" >
+        <action
+            android:id="@+id/action_fragmentTest_to_fragmentAboutMovie"
+            app:destination="@id/fragmentAboutMovie" />
+    </fragment>
 </navigation>
