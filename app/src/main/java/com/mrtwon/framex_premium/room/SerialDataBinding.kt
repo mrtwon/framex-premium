@@ -2,7 +2,7 @@ package com.mrtwon.framex_premium.room
 
 import com.mrtwon.framex_premium.ContentResponse.Serial
 import com.mrtwon.framex_premium.Helper.HelperFunction
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.GenresItem
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseSerial.GenresItem
 import java.lang.StringBuilder
 
 class SerialDataBinding(val serial: Serial){
@@ -21,6 +21,10 @@ class SerialDataBinding(val serial: Serial){
         val result = StringBuilder()
         result.append("(")
         for(key in genresList.indices){
+            if(key >= 4){
+                result.append("...")
+                break
+            }
             if(key == genresList.size-1) result.append(genresList[key]?.genre ?: continue)
             else result.append("${genresList[key]?.genre ?: continue},")
         }

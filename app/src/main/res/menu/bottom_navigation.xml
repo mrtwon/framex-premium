@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 <item
-    android:id="@+id/home"
+    android:id="@+id/fragmentHome"
     android:enabled="true"
     android:title="Главная"
-    android:icon="@drawable/ic_home"/>
+    android:icon="@drawable/ic_home"
+    tools:layout="@layout/fragment_home"
+    />
 <item
-    android:id="@+id/favorite"
+    android:id="@+id/fragmentFavorite"
     android:enabled="true"
     android:title="Избранные"
-    android:icon="@drawable/ic_favorite_click"/>
+    android:icon="@drawable/ic_favorite_click"
+    tools:layout="@layout/fragment_favorite"
+    />
 <item
-    android:id="@+id/search"
+    android:id="@+id/fragmentSearch"
     android:enabled="true"
     android:title="Найти"
-    android:icon="@drawable/ic_search"/>
+    android:icon="@drawable/ic_search"
+    tools:layout="@layout/fragment_search"
+    />
 <item
-    android:id="@+id/subscription"
+    android:id="@+id/fragmentSubscription"
     android:enabled="true"
     android:title="Подписки"
     android:icon="@drawable/ic_subscription"/>
-
-
 </menu>

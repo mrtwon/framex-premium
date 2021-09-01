@@ -32,6 +32,15 @@ class HelperFunction {
             }
             return "http://framex.application/$contentResult/$id"
         }
+
+
+        // substring title with count chars > 27
+        fun substringTitle(str: String): String{
+            if(str.length > 27){
+                return str.substring(0, 27) + "..."
+            }
+            return str
+        }
     }
 
 }

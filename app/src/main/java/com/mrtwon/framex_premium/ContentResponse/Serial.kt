@@ -1,10 +1,8 @@
 package com.mrtwon.framex_premium.ContentResponse
 
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseMovie.ResponseMovie
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.CountriesItem
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.GenresItem
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerial
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerialItem
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseSerial.CountriesItem
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseSerial.GenresItem
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseSerial.ResponseSerial
 
 class Serial: ContentResponse(){
     //kinopoisk
@@ -82,6 +80,7 @@ class Serial: ContentResponse(){
 
                 imdb_rating = rating?.imdb
                 kinopoisk_raintg = rating?.kinopoisk
+                poster_preview = posterUrlPreview
             }
         }
 
@@ -138,6 +137,8 @@ class Serial: ContentResponse(){
 
                     current_page = responseSerial.currentPage
                     last_page = responseSerial.lastPage
+
+                    poster_preview = posterUrlPreview
                 })
             }
             return result

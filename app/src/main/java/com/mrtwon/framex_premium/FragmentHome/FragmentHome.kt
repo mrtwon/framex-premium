@@ -22,6 +22,7 @@ import com.mrtwon.framex_premium.Content.GenresEnum
 import com.mrtwon.framex_premium.Content.ParcelableEnum
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.MainViewModel
+import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.room.Content
 import com.mrtwon.framex_premium.room.Recent
@@ -35,7 +36,6 @@ import kotlinx.android.synthetic.main.fragment_about_movie.view.*
 import kotlinx.android.synthetic.main.fragment_about_movie.view.tool_bar
 import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.layout_report_fragment.view.*
-import kotlinx.android.synthetic.main.layout_welcome.view.*
 
 class FragmentHome: Fragment() {
     val vm: MainViewModel by lazy { ViewModelProvider(requireActivity()).get(MainViewModel::class.java) }
@@ -54,18 +54,6 @@ class FragmentHome: Fragment() {
         card_view_recent = view.recent_card_view
         recent_rv.adapter = AdapterRecent(listRecent)
         recent_rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-        toolbar = view.findViewById(R.id.tool_bar)
-        toolbar.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.bug_report -> {
-                    showBottomSheetDialog()
-                    true
-                }
-                else ->{
-                    true
-                }
-            }
-        }
 
         recent_rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(AdapterRecent(listRecent))).apply {
             setDuration(400)
@@ -201,8 +189,9 @@ class FragmentHome: Fragment() {
                 "movie" -> "Фильм"
                 else -> "Контент"
             }
-            Picasso.get()
+            MyApplication.getInstance.picasso
                 .load(recent.poster)
+                .fit()
                 .into(image)
         }
     }

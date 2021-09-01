@@ -2,7 +2,7 @@ package com.mrtwon.framex_premium.room
 
 import com.mrtwon.framex_premium.ContentResponse.Movie
 import com.mrtwon.framex_premium.Helper.HelperFunction.Companion.roundRating
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseMovie.GenresItem
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseMovie.GenresItem
 import java.lang.StringBuilder
 
 class MovieDataBinding(val movie: Movie){
@@ -23,6 +23,10 @@ class MovieDataBinding(val movie: Movie){
         val result = StringBuilder()
         result.append("(")
         for(key in genresList.indices){
+            if(key >= 4){
+                result.append("...")
+                break
+            }
             if(key == genresList.size-1) result.append(genresList[key]?.genre ?: continue)
             else result.append("${genresList[key]?.genre ?: continue},")
         }

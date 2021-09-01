@@ -1,6 +1,6 @@
 package com.mrtwon.framex_premium.ContentResponse
 
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseMovie.*
+import com.mrtwon.framex_premium.retrofit.framexPojo.responseMovie.*
 
 class Movie: ContentResponse(){
 
@@ -75,6 +75,8 @@ class Movie: ContentResponse(){
 
                 current_page = responseMovie.currentPage
                 last_page = responseMovie.lastPage
+
+                poster_preview = posterUrlPreview
             }
         }
         fun buildMovies(responseMovie: ResponseMovie?): List<Movie>{
@@ -125,6 +127,8 @@ class Movie: ContentResponse(){
 
                     current_page = responseMovie.currentPage
                     last_page = responseMovie.lastPage
+
+                    poster_preview = posterUrlPreview
                 })
             }
             return result

@@ -25,6 +25,7 @@ import com.mrtwon.framex_premium.Content.ParcelableEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.Helper.HelperFunction.Companion.roundRating
 import com.mrtwon.framex_premium.MainActivity
+import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -152,21 +153,20 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         gif_load.visibility = View.GONE
     }
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), AnimateViewHolder{
-        lateinit var content_layout: LinearLayout
-        lateinit var poster: ImageView
-        lateinit var rating_kp: TextView
-        lateinit var rating_imdb: TextView
-        lateinit var title: TextView
+
+        val content_layout = itemView.findViewById<LinearLayout>(R.id.content_layout)
+        val poster = itemView.findViewById<ImageView>(R.id.poster)
+        val rating_kp = itemView.findViewById<TextView>(R.id.kp_rating)
+        val rating_imdb = itemView.findViewById<TextView>(R.id.imdb_rating)
+        val title = itemView.findViewById<TextView>(R.id.title)
         fun build(content: ContentResponse){
             //init
-            content_layout = itemView.findViewById(R.id.content_layout)
-            poster = itemView.findViewById(R.id.poster)
-            title = itemView.findViewById(R.id.title)
-            rating_kp = itemView.findViewById(R.id.kp_rating)
-            rating_imdb = itemView.findViewById(R.id.imdb_rating)
             //build
             if(content.poster != null) {
-                Picasso.get().load(content.poster).into(poster, object: Callback{
+                MyApplication.getInstance.picasso
+                    .load(content.poster_preview)
+                    .fit()
+                    .into(poster, object: Callback{
                     override fun onSuccess() {}
                     override fun onError(e: Exception?) {
                         Log.i("self-top-content","error image load")
@@ -222,12 +222,13 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
     }
     inner class Adapter(val contentList: List<ContentResponse>): RecyclerView.Adapter<ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            log("[recyclerview] onCreateViewHolder()")
             val view = layoutInflater.inflate(R.layout.one_top_element, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            log("get position ${position}")
+            log("[recyclerview] onBindViewHolder position ${position}")
             if(position == contentList.size-1){
                 if(genres != null) vm.giveNextPageGenres(genres!!, contentType)
                 else if(collection != null) vm.giveNextPageCollection(collection!!, contentType)
@@ -236,7 +237,6 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         }
 
         override fun getItemCount(): Int {
-            log("size count - ${contentList.size}")
             return contentList.size
         }
     }
@@ -251,7 +251,7 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         }
     }
 
-    override fun onPause() {
+    /*override fun onPause() {
         Log.i("self-top","onPause()")
         super.onPause()
     }
@@ -266,7 +266,7 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
     override fun onDestroy() {
         Log.i("self-top","Destroy()")
         super.onDestroy()
-    }
+    }*/
     private fun log(s: String){
         Log.i("self-top-content",s)
     }

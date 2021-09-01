@@ -29,7 +29,6 @@
             android:id="@+id/poster"
             android:layout_width="100dp"
             android:layout_height="130dp"
-            tools:src="@drawable/poster"
             android:scaleType="centerCrop"
             android:alpha="0.9"
             />

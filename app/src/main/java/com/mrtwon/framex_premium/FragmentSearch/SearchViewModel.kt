@@ -7,14 +7,14 @@ import com.mrtwon.framex_premium.GeneralVM
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 class SearchViewModel: GeneralVM() {
-    val searchContent = MutableLiveData<List<ContentResponse>>()
+    val searchContent = MutableLiveData<List<ContentResponse>?>()
     private val searchContentSerial = MutableLiveData<List<ContentResponse>>()
     private val searchContentMovie = MutableLiveData<List<ContentResponse>>()
     val searchQuery = MutableLiveData<String>()
     val searchQueryDescription = MutableLiveData<String>()
-    val notFoundLiveData = MutableLiveData<Boolean>()
-    val connectErrorLiveData = MutableLiveData<Boolean>()
-    val loadLiveData = MutableLiveData<Boolean>()
+    val notFoundLiveData = MutableLiveData<Boolean?>()
+    val connectErrorLiveData = MutableLiveData<Boolean?>()
+    val loadLiveData = MutableLiveData<Boolean?>()
 
     var currentPageSerial = 1
     var currentPageMovie = 1
@@ -119,12 +119,12 @@ class SearchViewModel: GeneralVM() {
         if (searchString != null)
             model.searchContentByTitle(searchString, nextPageMovie, nextPageSerial,
                 {
-                    lastPageMovie = if (it.isNotEmpty()) it[it.lastIndex].last_page else 0
-                    log("input movie last page ${it[it.lastIndex].last_page}")
-                },
-                {
                     log("input serial last page ${it[it.lastIndex].last_page}")
                     lastPageSerial = if (it.isNotEmpty()) it[it.lastIndex].last_page else 0
+                },
+                {
+                    lastPageMovie = if (it.isNotEmpty()) it[it.lastIndex].last_page else 0
+                    log("input movie last page ${it[it.lastIndex].last_page}")
                 },
                 {
                     log("new content, size = ${it.size}")
@@ -133,6 +133,11 @@ class SearchViewModel: GeneralVM() {
                 {
                     connectErrorLiveData.postValue(it)
                 })
+    }
+
+    override fun onCleared() {
+        log("onCleared()")
+        super.onCleared()
     }
 
     fun log(s: String){

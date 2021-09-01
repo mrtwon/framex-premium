@@ -29,7 +29,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -92,7 +92,7 @@ dependencies {
     implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
 
     //pie loader (github)
-    compile 'com.github.zurche:plain-pie:v0.2.9'
+    /*compile 'com.github.zurche:plain-pie:v0.2.9'*/
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.23'
 
     implementation 'com.tomer:fadingtextview:2.6'

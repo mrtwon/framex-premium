@@ -11,6 +11,7 @@ open class ContentResponse {
    var year: Int? = null
    var contentType: String = ""
    var poster: String? = null
+   var poster_preview: String? = null
    var iframe_src: String? = null
 
    //rating

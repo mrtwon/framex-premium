@@ -12,16 +12,11 @@ import com.mrtwon.framex_premium.Content.GenresEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.ContentResponse.Movie
 import com.mrtwon.framex_premium.ContentResponse.Serial
-import com.mrtwon.framex_premium.retrofit.testPOJO.FramexApi
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseMovie.ResponseMovie
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerial
+import com.mrtwon.framex_premium.retrofit.framexPojo.FramexApi
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.*
 import kotlinx.coroutines.*
-import okhttp3.CacheControl
-import retrofit2.Retrofit
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /*
 * Model Class
@@ -59,7 +54,9 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     @DelicateCoroutinesApi
     fun searchContentByTitle(query: String, pageMovie: Int?, pageSerial: Int?, callbackSerial: (List<ContentResponse>) -> Unit,callbackMovie: (List<ContentResponse>) -> Unit, callbackAll: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
-            context, error -> callbackConnectError(true)
+            context, error ->
+                error.printStackTrace()
+                callbackConnectError(true)
         }) {
 
             val empty = arrayListOf<ContentResponse>()
@@ -120,7 +117,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                 }
             }
 
-            callbackAll(result)
+            callbackAll(ParseHtmlPrompt(result, query.toLowerCase(Locale.ROOT)))
         }
     }
 
@@ -274,7 +271,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                     val result = Recent().apply {
                         id_content = contentResponse.id
                         content_type = contentResponse.contentType
-                        poster = contentResponse.poster
+                        poster = contentResponse.poster_preview
                         time = getSecondTime()
                     }
                     db.dao().insertRecent(result)
@@ -352,7 +349,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
         val result = arrayListOf<ContentResponse>()
         for(element in contents){
             element.description?.let {
-                element.description = htmlPrompt(findString, it)
+                element.description = htmlPrompt(findString, it.toLowerCase())
             }
             result.add(element)
         }
@@ -370,7 +367,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     private fun getYear(): Int{
         val calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault())
         calendar.time = Date()
-        return calendar.get(Calendar.YEAR)+1
+        return calendar.get(Calendar.YEAR)
     }
 
 }

@@ -1,13 +1,11 @@
 package com.mrtwon.framex_premium.modules
 
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mrtwon.framex_premium.MyApplication
 import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
 import com.github.mrtwon.library.XmlParse
 import com.mrtwon.framex_premium.Model.Model
-import com.mrtwon.framex_premium.retrofit.testPOJO.FramexApi
+import com.mrtwon.framex_premium.retrofit.framexPojo.FramexApi
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.Database
 import dagger.Module

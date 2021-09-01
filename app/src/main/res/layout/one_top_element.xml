@@ -15,9 +15,8 @@
         >
     <ImageView
         android:id="@+id/poster"
-        android:layout_width="match_parent"
-        android:layout_height="190dp"
-        tools:src="@drawable/poster"
+        android:layout_width="150dp"
+        android:layout_height="195dp"
         android:scaleType="centerCrop"
         android:alpha="0.9"
         />

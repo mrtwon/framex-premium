@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
+import com.mrtwon.framex_premium.Helper.HelperFunction
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
@@ -145,7 +146,7 @@ class FragmentSubscription:  Fragment(){
         var delete: ImageButton = itemView.findViewById(R.id.delete)
         var layout: LinearLayout = itemView.findViewById(R.id.content_layout)
         fun bind(notification: Notification){
-            ru_title.text = notification.ru_title
+            ru_title.text = HelperFunction.substringTitle(notification.ru_title)
             season_and_episode.text = "${notification.season} x ${notification.series}"
             delete.setOnClickListener{
                 vm.removeNotification(notification)

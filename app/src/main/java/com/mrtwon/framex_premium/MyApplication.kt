@@ -10,17 +10,30 @@ import com.google.firebase.FirebaseApp
 import com.mrtwon.framex_premium.components.AppComponents
 import com.mrtwon.framex_premium.WorkManager.Work
 import com.mrtwon.framex_premium.components.DaggerAppComponents
+import com.squareup.picasso.Downloader
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MyApplication: Application() {
+    private val CACHE_SIZE = 52428800
     lateinit var appComponents: AppComponents
+    lateinit var picasso: Picasso
     override fun onCreate() {
         appComponents = DaggerAppComponents.create()
         getInstance = this
         startWorkManager()
         FirebaseApp.initializeApp(this)
+        buildPicasso()
         super.onCreate()
+    }
+
+    fun buildPicasso(){
+        picasso = Picasso.Builder(this)
+            .memoryCache(LruCache(CACHE_SIZE))
+            .build()
     }
 
     fun startWorkManager(){

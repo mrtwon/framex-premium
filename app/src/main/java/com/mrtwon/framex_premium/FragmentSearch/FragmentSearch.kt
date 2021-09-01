@@ -40,9 +40,7 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     lateinit var connect_error: View
     lateinit var load: GifImageView
     val list = arrayListOf<ContentResponse>()
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         rv = view.recycler_view
@@ -66,7 +64,15 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observerTextInput()
         observerSearch()
+        checkState()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    fun checkState(){
+        if(list.isNotEmpty()){
+            clearVisibility()
+            rv.visibility = View.VISIBLE
+        }
     }
 
 
@@ -89,25 +95,34 @@ class FragmentSearch: Fragment(), View.OnClickListener {
 
     fun observerSearch(){
         vm.searchContent.observe(viewLifecycleOwner){
+            if(it == null) return@observe
             if (it.isEmpty() && list.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
                 clearVisibility()
                 list.addAll(it)
+                rv.adapter?.notifyDataSetChanged()
                 rv.visibility = View.VISIBLE
             }
+            vm.searchContent.postValue(null)
         }
         vm.connectErrorLiveData.observe(viewLifecycleOwner){
+            if(it == null) return@observe
             Log.i("self","connectError")
             clearVisibility()
             connect_error.visibility = View.VISIBLE
+            vm.connectErrorLiveData.postValue(null)
         }
         vm.notFoundLiveData.observe(viewLifecycleOwner){
+            if(it == null) return@observe
             clearVisibility()
             not_found.visibility = View.VISIBLE
+            vm.connectErrorLiveData.postValue(null)
         }
         vm.loadLiveData.observe(viewLifecycleOwner){
+            if(it == null) return@observe
             clearVisibility()
             load.visibility = if(it) View.VISIBLE else View.GONE
+            vm.loadLiveData.postValue(null)
         }
     }
     fun clearVisibility(){

@@ -80,7 +80,6 @@ class TopViewModel: GeneralVM() {
                 },
                 {
                     listLiveData.postValue(it)
-                    lastPage = it[it.lastIndex].last_page
                 }
             )
         }

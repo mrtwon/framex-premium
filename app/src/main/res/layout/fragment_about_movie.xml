@@ -48,7 +48,7 @@
         android:layout_height="match_parent"
         android:theme="@style/AppTheme.About"
         android:fitsSystemWindows="true"
-        android:visibility="gone"
+        android:visibility="visible"
         >
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tool_bar"
@@ -68,22 +68,25 @@
             android:layout_height="250dp"
             android:layout_marginTop="90dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/poster"
             android:layout_gravity="center|top"
             />
         <LinearLayout
             android:id="@+id/box"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="350dp"
             android:alpha="0.9"
             android:background="#000"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:layout_marginBottom="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            >
             <TextView
                 android:id="@+id/title"
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                tools:text="Теория Большого Взрыва (2008)"
+                tools:text="Теория Большого Взрыва Взрыва  Взрыва Взрыва(2008) "
                 android:text="@{movie.ru_title}"
                 android:textColor="#E1E1E1"
                 android:textSize="22sp"
@@ -91,16 +94,20 @@
                 android:layout_gravity="center"
                 android:textAlignment="center"
                 android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-black"
                 />
             <TextView
                 android:id="@+id/genres"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="(комедия, ситком, драма)"
+                tools:text="(комедия, ситком, драма, комедия, ситком, драма, комедия, ситком, драма)"
                 android:text="@{movie.genres}"
                 android:textStyle="italic"
                 android:textColor="#E1E1E1"
                 android:layout_gravity="center"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+
                 />
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -127,6 +134,7 @@
                         android:textColor="#E1E1E1"
                         android:textSize="30sp"
                         android:textStyle="bold"
+                        android:fontFamily="serif"
                         />
                 </LinearLayout>
                 <LinearLayout
@@ -147,6 +155,7 @@
                         android:textColor="#E1E1E1"
                         android:textSize="30sp"
                         android:textStyle="bold"
+                        android:fontFamily="serif"
                         android:layout_marginLeft="5dp"
                         />
                 </LinearLayout>
@@ -166,6 +175,8 @@
                     android:drawableLeft="@drawable/ic_notification"
                     android:clickable="false"
                     android:alpha="0.5"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
                     />
 
                 <Button
@@ -174,6 +185,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/text_button_look"
                     android:drawableRight="@drawable/ic_look"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"
                     />
             </LinearLayout>
             <androidx.core.widget.NestedScrollView
@@ -193,7 +206,9 @@
                     android:textAlignment="center"
                     android:letterSpacing="0.09"
                     android:padding="10dp"
-                    tools:text="Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин.Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин."/>
+                    tools:text="Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин.Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин."
+                    android:fontFamily="sans-serif-condensed"
+                    />
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>
     </FrameLayout>

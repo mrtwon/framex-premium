@@ -23,6 +23,7 @@ import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.Helper.HelperFunction
 import com.mrtwon.framex_premium.MainActivity
+import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.databinding.FragmentAboutSerialBinding
 import com.mrtwon.framex_premium.room.MovieDataBinding
@@ -161,7 +162,7 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
                         view.serial = SerialDataBinding(it)
 
                         //load poster
-                        setPosterAndBackground(it.poster)
+                        setPosterAndBackground(it.poster_preview)
                     }
 
                 }
@@ -193,7 +194,7 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
 
         fun loadBackgroundPoster(url: String?){
             val imageBuff = ImageView(requireContext())
-            Picasso.get()
+            MyApplication.getInstance.picasso
                 .load(url)
                 .transform(BlurTransformation(requireActivity(), 25, 1))
                 .into(imageBuff, object: Callback{
@@ -207,8 +208,9 @@ class FragmentAboutSerial: Fragment(), View.OnClickListener, Toolbar.OnMenuItemC
         }
 
         fun loadPoster(url: String?){
-            Picasso.get()
+            MyApplication.getInstance.picasso
                 .load(url)
+                .fit()
                 .into(view.poster, object: Callback{
                     override fun onSuccess() {
 

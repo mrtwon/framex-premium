@@ -8,9 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,14 +17,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
-import com.mrtwon.framex_premium.retrofit.testPOJO.responseSerial.ResponseSerial
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import kotlinx.android.synthetic.main.fragment_about_movie.view.*
 import kotlinx.android.synthetic.main.fragment_search.view.recycler_view
 import kotlinx.android.synthetic.main.fragment_search.view.text_input
-import kotlinx.android.synthetic.main.fragment_search.view.welcome_search
 import kotlinx.android.synthetic.main.fragment_search_description.view.*
 import kotlinx.android.synthetic.main.layout_error_load.view.*
 import kotlinx.android.synthetic.main.one_element_search.view.*
@@ -44,6 +40,7 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     lateinit var connect_error: View
     lateinit var load: GifImageView
     val list = arrayListOf<ContentResponse>()
+    val saveState = Bundle()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -56,12 +53,12 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         connect_error.reload.setOnClickListener(this)
         load = view.findViewById(R.id.gif_load)
         welcome_search = view.welcome_image
+        rv.itemAnimator = FadeInAnimator()
+        rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(SearchAdapter(list))).apply {
             setDuration(200)
             setFirstOnly(false)
         }
-        rv.itemAnimator = FadeInAnimator()
-        rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         view.chip_one.setOnClickListener(this)
         view.chip_two.setOnClickListener(this)
         view.chip_three.setOnClickListener(this)
@@ -73,7 +70,15 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         observerTextInput()
         observerSearch()
+        checkState()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    fun checkState(){
+        if(list.isNotEmpty()){
+            clearVisibility()
+            rv.visibility = View.VISIBLE
+        }
     }
 
     @DelicateCoroutinesApi
@@ -90,18 +95,17 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     }
     fun observerSearch(){
         vm.searchContent.observe(viewLifecycleOwner){
-            if (it.isEmpty()) vm.notFoundLiveData.postValue(true)
+            if(it == null) return@observe
+            log("observerSearch()")
+            if (it.isEmpty() && list.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
                 clearVisibility()
-                if(it.isEmpty() && list.isEmpty()){
-                    vm.notFoundLiveData.postValue(true)
-                }else{
                     list.addAll(it)
                     rv.adapter?.notifyDataSetChanged()
                     rv.visibility = View.VISIBLE
 
-                }
             }
+            vm.searchContent.postValue(null)
         }
         vm.connectErrorLiveData.observe(viewLifecycleOwner){
             clearVisibility()
@@ -112,8 +116,11 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
             not_found.visibility = View.VISIBLE
         }
         vm.loadLiveData.observe(viewLifecycleOwner){
+            if(it == null) return@observe
+            log("observerSearch()")
             clearVisibility()
             load.visibility = if(it) View.VISIBLE else View.GONE
+            vm.loadLiveData.postValue(null)
         }
     }
     fun clearVisibility(){
@@ -175,6 +182,7 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         }
 
         override fun getItemCount(): Int {
+            log("rv size = ${contentList.size}")
             return contentList.size
         }
 
@@ -182,6 +190,10 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
 
 
     override fun onDestroyView() {
+        rv.layoutManager?.onSaveInstanceState()?.let {
+            log("save state")
+            saveState.putParcelable("rv", it)
+        }
         log("onDestroyView()")
         super.onDestroyView()
     }

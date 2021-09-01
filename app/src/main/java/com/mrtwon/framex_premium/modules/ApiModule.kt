@@ -6,7 +6,7 @@ import com.github.mrtwon.library.IgnoreCode
 import com.github.mrtwon.library.XmlParse
 import com.github.mrtwon.library.XmlParseBuilder
 import com.mrtwon.framex_premium.MyApplication
-import com.mrtwon.framex_premium.retrofit.testPOJO.FramexApi
+import com.mrtwon.framex_premium.retrofit.framexPojo.FramexApi
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import dagger.Module
 import dagger.Provides
@@ -24,7 +24,7 @@ class ApiModule {
     @Provides
     fun getFxApi(client: OkHttpClient): FramexApi{
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.217/")
+            .baseUrl("http://195.58.48.9/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

@@ -7,16 +7,21 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.mrtwon.framex_premium.FragmentAbout.FragmentAboutMovie
+import com.squareup.picasso.Picasso
 import java.net.URI
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var bottomBar: BottomNavigationView
     val vm: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
@@ -26,7 +31,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         setContentView(R.layout.activity_main)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         bottomBar = findViewById(R.id.bottom_nav_menu)
-        bottomBar.setOnItemSelectedListener(this)
+        //bottomBar.setOnItemSelectedListener(this)
 
 
         //если пришёл intent с намерением запустить фрагмент
@@ -41,6 +46,8 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 "FragmentSubscription" -> navController.navigate(R.id.fragmentSubscription)
             }
         }
+
+        bottomBar.setupWithNavController(navController)
     }
     fun hiddenBottomBar(){
         bottomBar.visibility = View.GONE
@@ -49,7 +56,8 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         bottomBar.visibility = View.VISIBLE
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+    /*override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.favorite -> { navController.navigate(R.id.fragmentFavorite) }
             R.id.home -> { navController.navigate(R.id.fragmentHome)}
@@ -57,9 +65,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             R.id.subscription -> { navController.navigate(R.id.fragmentSubscription) }
         }
         return true
-    }
+    }*/
     fun reselectedNavigationPosition(){
-        val current = navController.currentDestination?.id
+        /*val current = navController.currentDestination?.id
         when(current){
             R.id.fragmentHome -> {
                 if(bottomBar.selectedItemId != R.id.home) {
@@ -76,7 +84,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                     bottomBar.selectedItemId = R.id.search
                 }
             }
-        }
+        }*/
     }
 
 
