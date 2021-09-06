@@ -70,8 +70,11 @@ class FragmentSearch: Fragment(), View.OnClickListener {
 
     fun checkState(){
         if(list.isNotEmpty()){
+            log("list isn't empty")
             clearVisibility()
             rv.visibility = View.VISIBLE
+        }else{
+            log("list is empty")
         }
     }
 
@@ -80,8 +83,8 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     @DelicateCoroutinesApi
     fun observerTextInput(){
         text_input.setOnEditorActionListener { v, actionId, event ->
-            if(actionId == EditorInfo.IME_ACTION_DONE){
-                Log.i("self-search","string query: ${v.text.toString()}")
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT){
+                Log.i("self-search","string query: ${v.text}")
                 list.clear()
                 rv.adapter?.notifyDataSetChanged()
                 vm.searchQuery.postValue(v.text.toString())
@@ -107,7 +110,6 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         }
         vm.connectErrorLiveData.observe(viewLifecycleOwner){
             if(it == null) return@observe
-            Log.i("self","connectError")
             clearVisibility()
             connect_error.visibility = View.VISIBLE
             vm.connectErrorLiveData.postValue(null)
@@ -116,7 +118,7 @@ class FragmentSearch: Fragment(), View.OnClickListener {
             if(it == null) return@observe
             clearVisibility()
             not_found.visibility = View.VISIBLE
-            vm.connectErrorLiveData.postValue(null)
+            vm.notFoundLiveData.postValue(null)
         }
         vm.loadLiveData.observe(viewLifecycleOwner){
             if(it == null) return@observe

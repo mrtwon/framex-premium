@@ -28,9 +28,9 @@ interface FramexApi {
 
 
   // search by title
-  @GET("api/movie/query?limit=20?ordering=rating.kinopoisk&direction=desc")
+  @GET("api/movie/query?limit=20&ordering=rating.kinopoisk&direction=desc")
   fun searchMovieByTitle(@Query("title") title: String, @Query("page") page: Int): Call<ResponseMovie>
-  @GET("api/serial/query?limit=20?ordering=rating.kinopoisk&direction=desc")
+  @GET("api/serial/query?limit=20&ordering=rating.kinopoisk&direction=desc")
   fun searchSerialByTitle(@Query("title") title: String, @Query("page") page: Int): Call<ResponseSerial>
 
   //search by description

@@ -1,6 +1,8 @@
 package com.mrtwon.framex_premium.ActivityWebView
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,7 +19,7 @@ class ActivityWebView: AppCompatActivity() {
     var id: Int? = null
     var contentType: String? = null
     val vm: WebViewVM by lazy { ViewModelProvider(this).get(WebViewVM::class.java) }
-
+    var currentUriToContent: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_webview)
         web_view = findViewById(R.id.web_view)
@@ -38,7 +40,7 @@ class ActivityWebView: AppCompatActivity() {
     fun initWebView(wv: WebView){
         wv.apply {
             webViewClient = BlockOtherVideo()
-            webChromeClient = WebChromeClient()
+            webChromeClient = ChromeClient()
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.javaScriptCanOpenWindowsAutomatically = true
@@ -56,9 +58,21 @@ class ActivityWebView: AppCompatActivity() {
         }
     }
 
+    private inner class ChromeClient : WebChromeClient(){
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+            if(consoleMessage != null && consoleMessage.message().contains("download")){
+                if(currentUriToContent == null) toastErrorOpenBrowser()
+                else openBrowser()
+            }
+            log("CONSOLE: "+consoleMessage?.message())
+            return super.onConsoleMessage(consoleMessage)
+        }
+    }
+
     private inner class BlockOtherVideo internal constructor() : WebViewClient() {
 
         override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+            actionContentLink(request)
             if(isBlockedUrl(request)){
                 log("blocked resource: ${request?.url?.host}")
                 return createEmptyResource()
@@ -92,6 +106,43 @@ class ActivityWebView: AppCompatActivity() {
         }
 
     }
+
+    fun actionContentLink(webResource: WebResourceRequest?) {
+        if (webResource == null) return
+        val targetHost = "cloud.cdnland.in"
+        val fullAddress = webResource.url
+        val currentHost = webResource.url.host ?: return
+        if (currentHost.contains(targetHost, ignoreCase = true)) {
+            log("add to currentUri")
+            currentUriToContent = fullAddress
+        }
+    }
+
+    fun openBrowser(){
+        currentUriToContent?.let { link ->
+            log("openBrowser")
+            startActivity(Intent(Intent.ACTION_VIEW, link))
+        }
+    }
+
+    fun toastErrorOpenBrowser(){
+        Toast.makeText(this, "Ошибка. Попробуйте подождать загрузку видео", Toast.LENGTH_LONG).show()
+    }
+    /*fun downloadContent(webResource: WebResourceRequest?): Boolean{
+        if(webResource == null) return false
+        val targetHost = "cloud.cdnland.in"
+        val fullAddress = webResource.url
+        val currentHost = webResource.url.host ?: return false
+        if(currentHost.contains(targetHost, ignoreCase = true) && isDownload){
+            log("equals, addr = ${fullAddress}")
+            val intent = Intent(Intent.ACTION_VIEW, fullAddress)
+            startActivity(intent)
+            isDownload = false
+            log("isDownload = ${isDownload}")
+            return true
+        }else log("not equals, addr = $fullAddress")
+        return false
+    }*/
 
 
     fun log(s: String){
