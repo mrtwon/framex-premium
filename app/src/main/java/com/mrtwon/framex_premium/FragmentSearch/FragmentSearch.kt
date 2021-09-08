@@ -39,6 +39,8 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     lateinit var not_found: View
     lateinit var connect_error: View
     lateinit var load: GifImageView
+    lateinit var loadInRv: GifImageView
+    lateinit var layout_rv: LinearLayout
     val list = arrayListOf<ContentResponse>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,6 +51,8 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         not_found = view.not_found
         connect_error = view.error_load
         load = view.gif_load
+        layout_rv = view.findViewById(R.id.layout_rv)
+        loadInRv = view.findViewById(R.id.gif_load_in_rv)
         connect_error.reload.setOnClickListener(this)
         rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(SearchAdapter(list))).apply {
             setDuration(200)
@@ -72,7 +76,7 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         if(list.isNotEmpty()){
             log("list isn't empty")
             clearVisibility()
-            rv.visibility = View.VISIBLE
+            layout_rv.visibility = View.VISIBLE
         }else{
             log("list is empty")
         }
@@ -97,34 +101,33 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     }
 
     fun observerSearch(){
+        vm.connectErrorLiveData.observe(viewLifecycleOwner){
+            if(it) clearVisibility()
+            connect_error.visibility = if(it) View.VISIBLE else View.GONE
+        }
+        vm.notFoundLiveData.observe(viewLifecycleOwner){
+            if(it) clearVisibility()
+            not_found.visibility = if(it) View.VISIBLE else View.GONE
+        }
+        vm.loadLiveData.observe(viewLifecycleOwner){
+            if (list.isNotEmpty()) {
+                loadInRv.visibility = if (it) View.VISIBLE else View.GONE
+            } else {
+                if (it) clearVisibility()
+                load.visibility = if (it) View.VISIBLE else View.GONE
+            }
+        }
         vm.searchContent.observe(viewLifecycleOwner){
             if(it == null) return@observe
             if (it.isEmpty() && list.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
+                vm.notFoundLiveData.postValue(false)
                 clearVisibility()
                 list.addAll(it)
                 rv.adapter?.notifyDataSetChanged()
-                rv.visibility = View.VISIBLE
+                layout_rv.visibility = View.VISIBLE
             }
             vm.searchContent.postValue(null)
-        }
-        vm.connectErrorLiveData.observe(viewLifecycleOwner){
-            if(it == null) return@observe
-            clearVisibility()
-            connect_error.visibility = View.VISIBLE
-            vm.connectErrorLiveData.postValue(null)
-        }
-        vm.notFoundLiveData.observe(viewLifecycleOwner){
-            if(it == null) return@observe
-            clearVisibility()
-            not_found.visibility = View.VISIBLE
-            vm.notFoundLiveData.postValue(null)
-        }
-        vm.loadLiveData.observe(viewLifecycleOwner){
-            if(it == null) return@observe
-            clearVisibility()
-            load.visibility = if(it) View.VISIBLE else View.GONE
-            vm.loadLiveData.postValue(null)
         }
     }
     fun clearVisibility(){
@@ -132,7 +135,7 @@ class FragmentSearch: Fragment(), View.OnClickListener {
         connect_error.visibility = View.GONE
         load.visibility = View.GONE
         welcome_search.visibility = View.GONE
-        rv.visibility = View.GONE
+        layout_rv.visibility = View.GONE
     }
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val tv_title = itemView.title
@@ -215,5 +218,6 @@ class FragmentSearch: Fragment(), View.OnClickListener {
     fun log(s: String){
         Log.i("self-search",s)
     }
+    data class StatusFilter(var checkMovie: Boolean = false, var checkSerial: Boolean = false)
 
 }

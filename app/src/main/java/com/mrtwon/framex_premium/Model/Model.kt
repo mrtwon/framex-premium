@@ -9,9 +9,11 @@ import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.room.Database
 import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
+import com.mrtwon.framex_premium.Content.RatingEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
 import com.mrtwon.framex_premium.ContentResponse.Movie
 import com.mrtwon.framex_premium.ContentResponse.Serial
+import com.mrtwon.framex_premium.FragmentTop.Filter
 import com.mrtwon.framex_premium.retrofit.framexPojo.FramexApi
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
 import com.mrtwon.framex_premium.room.*
@@ -81,7 +83,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                     result.addAll(mResult)
                 }
             }
-
+            callbackConnectError(false)
             callbackAll(result)
         }
     }
@@ -90,6 +92,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     fun searchContentByDescription(query: String, pageMovie: Int?, pageSerial: Int?, callbackMovie: (List<ContentResponse>) -> Unit, callbackSerial: (List<ContentResponse>) -> Unit, callbackAll: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
                 context, error -> callbackConnectError(true)
+                error.printStackTrace()
         }) {
 
             log("input model, lastMovie: ${pageMovie}, lastSerial ${pageSerial}")
@@ -116,7 +119,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                     result.addAll(mResult)
                 }
             }
-
+            callbackConnectError(false)
             callbackAll(ParseHtmlPrompt(result, query.toLowerCase(Locale.ROOT)))
         }
     }
@@ -143,25 +146,42 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     }
 
 
-    fun getTopByCollectionEnum(collectionContentEnum: CollectionContentEnum, content: ContentTypeEnum, page: Int, callback: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
+    fun getTopByCollectionEnum(collectionContentEnum: CollectionContentEnum, content: ContentTypeEnum, filter: Filter, page: Int, callback: (List<ContentResponse>) -> Unit, callbackConnectError: (Boolean) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
                 context, exception ->
                 callbackConnectError(true)
         }) {
+            val orderingRating = convertRatingFilterToOrdering(filter)
             when(content){
                 ContentTypeEnum.MOVIE -> {
+                    log("switch movie")
                     when(collectionContentEnum){
                         CollectionContentEnum.NEW -> {
-                            val response = fxApi.getTopMovieByYear(getYear(), page).execute().body()
-                            callback(Movie.buildMovies(response))
+                            val response = if(filter.genres != null){
+                                fxApi.getTopMovieByYearWithGenres(getYear(), page,orderingRating, filter.genres.toString().toLowerCase(Locale.ROOT)).execute()
+                            }else{
+                                fxApi.getTopMovieByYear(getYear(), page, orderingRating).execute()
+                            }
+                            if(response.code() == 404) callback(arrayListOf())
+                            else if(response.code() in 200 .. 299){
+                                callback(Movie.buildMovies(response.body()))
+                            }
                         }
                     }
                 }
                 ContentTypeEnum.SERIAL ->{
+                    log("switch serial")
                     when(collectionContentEnum){
                         CollectionContentEnum.NEW -> {
-                            val response = fxApi.getTopSerialByYear(getYear(), page).execute().body()
-                            callback(Serial.buildSerials(response))
+                            val response = if(filter.genres != null){
+                                fxApi.getTopSerialByYearWithGenres(getYear(), page, orderingRating, filter.genres.toString().toLowerCase(Locale.ROOT)).execute()
+                            }else{
+                                fxApi.getTopSerialByYear(getYear(), page, orderingRating).execute()
+                            }
+                            if(response.code() == 404) callback(arrayListOf())
+                            else if(response.code() in 200 .. 299){
+                                callback(Serial.buildSerials(response.body()))
+                            }
                         }
                     }
                 }
@@ -171,14 +191,16 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
     }
 
     @DelicateCoroutinesApi
-    fun getTopByGenresEnum(genres: GenresEnum, content: ContentTypeEnum, page: Int, callbackConnectError: (Boolean) -> Unit, callback: (List<ContentResponse>) -> Unit){
+    fun getTopByGenresEnum(genres: GenresEnum, content: ContentTypeEnum, filter: Filter, page: Int, callbackConnectError: (Boolean) -> Unit, callback: (List<ContentResponse>) -> Unit){
         GlobalScope.launch(CoroutineExceptionHandler{
             context, exception ->
                 callbackConnectError(true)
         }){
+            val genresString = genres.toString().toLowerCase(Locale.ROOT)
+            val orderingRating = convertRatingFilterToOrdering(filter)
             when(content){
                 ContentTypeEnum.SERIAL ->{
-                    val response = fxApi.getTopSerialByGenres(genres.toString(), page).execute()
+                    val response = fxApi.getTopSerialByGenres(genresString, page, orderingRating).execute()
                     if(response.code() == 404){
                         callback(arrayListOf())
                     }
@@ -187,7 +209,7 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                     }
                 }
                 ContentTypeEnum.MOVIE -> {
-                    val response = fxApi.getTopMovieByGenres(genres.toString(), page).execute()
+                    val response = fxApi.getTopMovieByGenres(genresString, page, orderingRating).execute()
                     if(response.code() == 404){
                         callback(arrayListOf())
                     }
@@ -362,6 +384,10 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
 
     private fun getSecondTime(): Int{
         return (Date().time/1000).toInt()
+    }
+
+    private fun convertRatingFilterToOrdering(filter: Filter): String{
+        return if(filter.rating == RatingEnum.Kinopoisk) "rating.kinopoisk" else "rating.imdb"
     }
 
     private fun getYear(): Int{

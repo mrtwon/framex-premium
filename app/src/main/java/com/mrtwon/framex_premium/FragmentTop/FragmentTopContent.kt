@@ -41,6 +41,7 @@ import java.lang.Exception
 
 class FragmentTopContent: Fragment(), View.OnClickListener {
     val vm: TopViewModel by lazy { ViewModelProvider(this).get(TopViewModel::class.java) }
+    val mainTopVM: MainTopVM by lazy { ViewModelProvider(requireParentFragment()).get(MainTopVM::class.java) }
     val controller by lazy { (requireActivity() as MainActivity).navController }
 
     lateinit var gif_load: GifImageView
@@ -54,24 +55,19 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
     var genres: GenresEnum? = null
     var collection: CollectionContentEnum? = null
 
+    lateinit var currentFilter: Filter
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i("self-top","onCreate()")
-        // init content data of arg
         contentType = requireArguments().getParcelable<ParcelableEnum>("content_enum")!!.contentTypeEnum!!
         genres = arguments?.getParcelable<ParcelableEnum>("genres_enum")?.genresEnum
         collection = arguments?.getParcelable<ParcelableEnum>("collection_enum")?.collectionEnum
-        Log.i("self-top","contentType = $contentType | genres = $genres")
         super.onCreate(savedInstanceState)
     }
 
-    override fun onDestroyView() {
-        log("onDestroyView()")
-        super.onDestroyView()
-    }
     @DelicateCoroutinesApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         log("onCreateView")
         val view = inflater.inflate(R.layout.recyclerview_top_element, container, false)
+        currentFilter = mainTopVM.filterLiveData.value!!
         rv = view.recycler_view
         rv.adapter = ScaleInAnimationAdapter(AlphaInAnimationAdapter(Adapter(listContent))).apply {
             setDuration(700)
@@ -85,11 +81,12 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         rv.layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
         rv.itemAnimator = FadeInAnimator()
         observer()
+        observerChangeFilter()
         if(genres != null){
-            vm.getContentByGenresEnum(genres!!, contentType)
+            vm.getContentByGenresEnum(genres!!, contentType, currentFilter)
         }
         else if(collection != null){
-            vm.getContentByCollectionEnum(collection!!, contentType)
+            //vm.getContentByCollectionEnum(collection!!, contentType, currentFilter)
         }
         return view
     }
@@ -146,6 +143,21 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
             }
         }
     }
+
+    fun observerChangeFilter(){
+        mainTopVM.filterLiveData.observe(viewLifecycleOwner){
+            currentFilter = it
+            listContent.clear()
+            rv.adapter?.notifyDataSetChanged()
+            genres?.let {
+                vm.getContentByGenresEnum(it, contentType, currentFilter)
+            }
+            collection?.let{
+                vm.getContentByCollectionEnum(it, contentType, currentFilter)
+            }
+        }
+    }
+
     fun clearVisibility(){
         rv.visibility = View.GONE
         not_found.visibility = View.GONE
@@ -230,8 +242,8 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             log("[recyclerview] onBindViewHolder position ${position}")
             if(position == contentList.size-1){
-                if(genres != null) vm.giveNextPageGenres(genres!!, contentType)
-                else if(collection != null) vm.giveNextPageCollection(collection!!, contentType)
+                if(genres != null) vm.giveNextPageGenres(genres!!, contentType, currentFilter)
+                else if(collection != null) vm.giveNextPageCollection(collection!!, contentType, currentFilter)
             }
             holder.build(contentList[position])
         }
@@ -276,16 +288,16 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
             R.id.reload -> {
                 if(genres != null){
                     if(listContent.isEmpty()){
-                        vm.getContentByGenresEnum(genres!!, contentType)
+                        vm.getContentByGenresEnum(genres!!, contentType, currentFilter)
                     }else{
-                        vm.giveNextPageGenres(genres!!, contentType)
+                        vm.giveNextPageGenres(genres!!, contentType, currentFilter)
                     }
                 }
                 else if(collection != null){
                     if(listContent.isEmpty()){
-                        vm.getContentByCollectionEnum(collection!!, contentType)
+                        vm.getContentByCollectionEnum(collection!!, contentType, currentFilter)
                     }else{
-                        vm.giveNextPageCollection(collection!!, contentType)
+                        vm.giveNextPageCollection(collection!!, contentType, currentFilter)
                     }
                 }
 

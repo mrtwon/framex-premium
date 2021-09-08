@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,6 +40,8 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     lateinit var not_found: View
     lateinit var connect_error: View
     lateinit var load: GifImageView
+    lateinit var loadInRv: GifImageView
+    lateinit var layout_rv: LinearLayout
     val list = arrayListOf<ContentResponse>()
     val saveState = Bundle()
 
@@ -51,7 +54,9 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         not_found = view.findViewById(R.id.not_found)
         connect_error = view.findViewById(R.id.error_load)
         connect_error.reload.setOnClickListener(this)
+        loadInRv = view.findViewById(R.id.gif_load_in_rv)
         load = view.findViewById(R.id.gif_load)
+        layout_rv = view.findViewById(R.id.layout_rv)
         welcome_search = view.welcome_image
         rv.itemAnimator = FadeInAnimator()
         rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -74,10 +79,10 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    fun checkState(){
+    private fun checkState(){
         if(list.isNotEmpty()){
             clearVisibility()
-            rv.visibility = View.VISIBLE
+            layout_rv.visibility = View.VISIBLE
         }
     }
 
@@ -93,42 +98,43 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
             false
         }
     }
-    fun observerSearch(){
+    private fun observerSearch(){
+        vm.connectErrorLiveData.observe(viewLifecycleOwner){
+            if(it) clearVisibility()
+            connect_error.visibility = if(it) View.VISIBLE else View.GONE
+        }
+        vm.notFoundLiveData.observe(viewLifecycleOwner){
+            if(it) clearVisibility()
+            not_found.visibility = if(it) View.VISIBLE else View.GONE
+        }
+        vm.loadLiveData.observe(viewLifecycleOwner) {
+            if (list.isNotEmpty()) {
+                loadInRv.visibility = if (it) View.VISIBLE else View.GONE
+            } else {
+                if (it) clearVisibility()
+                load.visibility = if (it) View.VISIBLE else View.GONE
+            }
+        }
         vm.searchContent.observe(viewLifecycleOwner){
             if(it == null) return@observe
             log("observerSearch()")
             if (it.isEmpty() && list.isEmpty()) vm.notFoundLiveData.postValue(true)
             else {
+                vm.notFoundLiveData.postValue(false)
                 clearVisibility()
-                    list.addAll(it)
-                    rv.adapter?.notifyDataSetChanged()
-                    rv.visibility = View.VISIBLE
-
+                list.addAll(it)
+                rv.adapter?.notifyDataSetChanged()
+                layout_rv.visibility = View.VISIBLE
             }
             vm.searchContent.postValue(null)
         }
-        vm.connectErrorLiveData.observe(viewLifecycleOwner){
-            clearVisibility()
-            connect_error.visibility = View.VISIBLE
-        }
-        vm.notFoundLiveData.observe(viewLifecycleOwner){
-            clearVisibility()
-            not_found.visibility = View.VISIBLE
-        }
-        vm.loadLiveData.observe(viewLifecycleOwner){
-            if(it == null) return@observe
-            log("observerSearch()")
-            clearVisibility()
-            load.visibility = if(it) View.VISIBLE else View.GONE
-            vm.loadLiveData.postValue(null)
-        }
     }
-    fun clearVisibility(){
+    private fun clearVisibility(){
         not_found.visibility = View.GONE
         connect_error.visibility = View.GONE
         load.visibility = View.GONE
         welcome_search.visibility = View.GONE
-        rv.visibility = View.GONE
+        layout_rv.visibility = View.GONE
     }
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val tv_title = itemView.title
@@ -217,7 +223,10 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.reload -> {
-                vm.searchQueryDescription.postValue(vm.searchQueryDescription.value)
+                if(list.isEmpty())
+                    vm.searchQueryDescription.postValue(vm.searchQueryDescription.value)
+                else
+                    vm.nextPageDescription(vm.searchQueryDescription.value)
             }
             else -> {
                 list.clear()

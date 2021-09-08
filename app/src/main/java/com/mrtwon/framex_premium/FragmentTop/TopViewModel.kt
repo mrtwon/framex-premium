@@ -20,9 +20,9 @@ class TopViewModel: GeneralVM() {
     private var lastPage = 0
     private val MAX_PAGE = 5
     @DelicateCoroutinesApi
-    fun getContentByGenresEnum(genres: GenresEnum, content: ContentTypeEnum){
+    fun getContentByGenresEnum(genres: GenresEnum, content: ContentTypeEnum, filter: Filter){
         loadLiveData.postValue(true)
-        model.getTopByGenresEnum(genres, content, 1,
+        model.getTopByGenresEnum(genres, content, filter, 1,
             {
                 loadLiveData.postValue(false)
                 connectErrorLiveData.postValue(it)
@@ -37,9 +37,9 @@ class TopViewModel: GeneralVM() {
     }
 
     @DelicateCoroutinesApi
-    fun getContentByCollectionEnum(collection: CollectionContentEnum, content: ContentTypeEnum){
+    fun getContentByCollectionEnum(collection: CollectionContentEnum, content: ContentTypeEnum, filter: Filter){
         loadLiveData.postValue(true)
-        model.getTopByCollectionEnum(collection, content, 1,
+        model.getTopByCollectionEnum(collection, content, filter, 1,
             {
                 loadLiveData.postValue(false)
                 lastPage = if(it.isNotEmpty()) it[it.lastIndex].last_page else 0
@@ -52,11 +52,11 @@ class TopViewModel: GeneralVM() {
     }
 
     @DelicateCoroutinesApi
-    fun giveNextPageCollection(collection: CollectionContentEnum, content: ContentTypeEnum){
+    fun giveNextPageCollection(collection: CollectionContentEnum, content: ContentTypeEnum, filter: Filter){
         if(lastPage > currentPage && MAX_PAGE > currentPage){
             currentPage++
 
-            model.getTopByCollectionEnum(collection, content, currentPage,
+            model.getTopByCollectionEnum(collection, content, filter, currentPage,
                 {
                     listLiveData.postValue(it)
                 },
@@ -69,12 +69,12 @@ class TopViewModel: GeneralVM() {
 
 
     @DelicateCoroutinesApi
-    fun giveNextPageGenres(genres: GenresEnum, content: ContentTypeEnum){
+    fun giveNextPageGenres(genres: GenresEnum, content: ContentTypeEnum, filter: Filter){
         if(lastPage > currentPage && MAX_PAGE > currentPage){
             log("next if, content ${content.toString()}")
             currentPage++
 
-            model.getTopByGenresEnum(genres, content, currentPage,
+            model.getTopByGenresEnum(genres, content, filter, currentPage,
                 {
                     connectErrorLiveData.postValue(it)
                 },

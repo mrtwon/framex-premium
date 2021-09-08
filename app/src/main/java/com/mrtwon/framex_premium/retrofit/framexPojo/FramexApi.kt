@@ -7,17 +7,21 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface FramexApi {
-  @GET("api/serial?ordering=rating.kinopoisk&direction=desc&limit=20")
-  fun getTopSerialByGenres(@Query("genres") genres: String, @Query("page") page: Int): Call<ResponseSerial>
+  @GET("api/serial?direction=desc&limit=20")
+  fun getTopSerialByGenres(@Query("genres") genres: String, @Query("page") page: Int, @Query("ordering") ordering: String): Call<ResponseSerial>
 
-  @GET("api/movie?ordering=rating.kinopoisk&direction=desc&limit=20")
-  fun getTopMovieByGenres(@Query("genres") genres: String, @Query("page") page: Int): Call<ResponseMovie>
+  @GET("api/movie?direction=desc&limit=20")
+  fun getTopMovieByGenres(@Query("genres") genres: String, @Query("page") page: Int, @Query("ordering") ordering: String): Call<ResponseMovie>
 
-  @GET("api/movie/year?ordering=rating.kinopoisk&direction=desc&limit=20")
-  fun getTopMovieByYear(@Query("year") year: Int, @Query("page") page: Int): Call<ResponseMovie>
+  @GET("api/movie/year?direction=desc&limit=20")
+  fun getTopMovieByYear(@Query("year") year: Int, @Query("page") page: Int, @Query("ordering") ordering: String): Call<ResponseMovie>
+  @GET("api/movie/year?direction=desc&limit=20")
+  fun getTopMovieByYearWithGenres(@Query("year") year: Int, @Query("page") page: Int, @Query("ordering") ordering: String, @Query("genres") genres: String): Call<ResponseMovie>
 
-  @GET("api/serial/year?ordering=rating.kinopoisk&direction=desc&limit=20")
-  fun getTopSerialByYear(@Query("year") year: Int, @Query("page") page: Int): Call<ResponseSerial>
+  @GET("api/serial/year?&direction=desc&limit=20")
+  fun getTopSerialByYearWithGenres(@Query("year") year: Int, @Query("page") page: Int, @Query("ordering") ordering: String, @Query("genres") genres: String): Call<ResponseSerial>
+  @GET("api/serial/year?direction=desc&limit=20")
+  fun getTopSerialByYear(@Query("year") year: Int, @Query("page") page: Int, @Query("ordering") ordering: String): Call<ResponseSerial>
 
 
   @GET("api/serial/id")

@@ -73,20 +73,35 @@
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        />
-    <LinearLayout
-        android:id="@+id/welcome_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="visible"
-        >
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/layout_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            >
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="visible"
+
+                />
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gif_load_in_rv"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:src="@drawable/gif_load"
+                android:alpha="0.7"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
         <ImageView
             android:id="@+id/welcome_image"
             android:layout_width="300dp"
@@ -94,6 +109,7 @@
             android:alpha="0.5"
             android:src="@drawable/sherlok_stik_002"
             android:visibility="visible"
+            android:layout_gravity="center"
             />
         <include
             android:id="@+id/error_load"
@@ -116,5 +132,5 @@
             android:visibility="gone"
             />
 
-    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
