@@ -64,7 +64,7 @@ class ActivityWebView: AppCompatActivity() {
                 if(currentUriToContent == null) toastErrorOpenBrowser()
                 else openBrowser()
             }
-            log("CONSOLE: "+consoleMessage?.message())
+            //log("CONSOLE: "+consoleMessage?.message())
             return super.onConsoleMessage(consoleMessage)
         }
     }
@@ -74,10 +74,10 @@ class ActivityWebView: AppCompatActivity() {
         override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
             actionContentLink(request)
             if(isBlockedUrl(request)){
-                log("blocked resource: ${request?.url?.host}")
+                log("BLOCKED host: ${request?.url?.host} | path ${request?.url?.path}")
                 return createEmptyResource()
             }else{
-                log("not blocked url: ${request?.url?.host}")
+                log("accept url: host: ${request?.url?.host} | path ${request?.url?.path}")
                 return null
             }
         }
@@ -126,24 +126,8 @@ class ActivityWebView: AppCompatActivity() {
     }
 
     fun toastErrorOpenBrowser(){
-        Toast.makeText(this, "Ошибка. Попробуйте подождать загрузку видео", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Ошибка. Подождите загрузку контента", Toast.LENGTH_LONG).show()
     }
-    /*fun downloadContent(webResource: WebResourceRequest?): Boolean{
-        if(webResource == null) return false
-        val targetHost = "cloud.cdnland.in"
-        val fullAddress = webResource.url
-        val currentHost = webResource.url.host ?: return false
-        if(currentHost.contains(targetHost, ignoreCase = true) && isDownload){
-            log("equals, addr = ${fullAddress}")
-            val intent = Intent(Intent.ACTION_VIEW, fullAddress)
-            startActivity(intent)
-            isDownload = false
-            log("isDownload = ${isDownload}")
-            return true
-        }else log("not equals, addr = $fullAddress")
-        return false
-    }*/
-
 
     fun log(s: String){
         Log.i("self-webview-debug",s)

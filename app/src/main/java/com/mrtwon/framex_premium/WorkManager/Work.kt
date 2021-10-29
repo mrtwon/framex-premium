@@ -14,6 +14,8 @@ import androidx.work.WorkerParameters
 import com.mrtwon.framex_premium.components.AppComponents
 import com.mrtwon.framex_premium.components.DaggerAppComponents
 import com.mrtwon.framex_premium.MainActivity
+import com.mrtwon.framex_premium.Notification.createNotification
+import com.mrtwon.framex_premium.Notification.createNotificationChannel
 import com.mrtwon.framex_premium.R
 import com.mrtwon.framex_premium.retrofit.VideoCdn.TvSeries.POJOVideoCdnTS
 import com.mrtwon.framex_premium.retrofit.VideoCdn.VideoCdnApi
@@ -23,6 +25,8 @@ import kotlinx.coroutines.*
 import java.util.*
 
 class Work(private val context: Context, param: WorkerParameters): Worker(context, param) {
+    private val CHANNEL = "New Content"
+    private val TITLE = "Новая серия"
     private val NOTIFICATION_FORMAT = "%s %s сезон %s серия уже доступна"
     private lateinit var PENDING_INTENT: PendingIntent
     private var appComponents: AppComponents = DaggerAppComponents.create()
@@ -42,15 +46,15 @@ class Work(private val context: Context, param: WorkerParameters): Worker(contex
     private fun stepStart() {
         val scope = CoroutineScope(Job() + Dispatchers.IO + CoroutineExceptionHandler { _, _ -> {} })
         scope.launch {
-            createNotificationChannel()
             val subscriptions = database.dao().getSubscriptions()   // all episode for subscription
             for (subscript in subscriptions) {
                 launch {
-                    Log.i("self-worker","start processing ...")
+                    log("start processing ...")
                     val response = videoCdn.serialById(subscript.content_id).execute().body()  // serial-information by id
                     val episodeCount = response?.data?.get(0)?.episodeCount
                     if (episodeCount != null && episodeCount > subscript.count) {
-                        val wrapper = NotificationWrapper(response, subscript.count)
+                        log("[${subscript.content_id}] current episode count: ${subscript.count}, new episode count: $episodeCount")
+                        val wrapper = NotificationWrapper(response, subscript.count-1)
                         subscript.count = episodeCount
                         database.dao().updateSubscription(subscript)   // update last episode
                         stepTwo(wrapper)
@@ -79,21 +83,21 @@ class Work(private val context: Context, param: WorkerParameters): Worker(contex
         }
 
     private fun stepThree(notification: Notification){
-                Log.i("self-worker", "add to database")
+                log("add to database")
                 val text = String.format(
                     NOTIFICATION_FORMAT,
                     notification.ru_title,
                     notification.season,
                     notification.series
                 )
-                createNotification(text)
+                createNotification(text, TITLE, CHANNEL, PENDING_INTENT, context)
             database.dao().insertNotification(notification)
         }
 
 
-    private fun createNotification(text: String) {
+    /*private fun createNotification(text: String) {
         val id = Random().nextInt(5000)
-        Log.i("self-main", "createNotifty()")
+        log("createNotifty()")
         val builder = NotificationCompat.Builder(context, "101")
             .setSmallIcon(R.mipmap.icon_app)
             .setContentTitle("Новая серия")
@@ -114,7 +118,7 @@ class Work(private val context: Context, param: WorkerParameters): Worker(contex
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
-    }
+    }*/
 
     private fun log(s: String) {
         Log.i("self-worker", s)

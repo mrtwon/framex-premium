@@ -16,6 +16,7 @@ import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class MyApplication: Application() {
     private val CACHE_SIZE = 52428800
@@ -23,10 +24,11 @@ class MyApplication: Application() {
     lateinit var picasso: Picasso
     override fun onCreate() {
         appComponents = DaggerAppComponents.create()
-        getInstance = this
-        startWorkManager()
         FirebaseApp.initializeApp(this)
         buildPicasso()
+        statusWorker()
+        getInstance = this
+        //startWorkManager()
         super.onCreate()
     }
 
@@ -36,27 +38,30 @@ class MyApplication: Application() {
             .build()
     }
 
-    fun startWorkManager(){
+    private fun startWorkManager(){
+        val instance = WorkManager.getInstance(applicationContext)
+
+        val constraint = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val myRequest = PeriodicWorkRequest.Builder(Work::class.java, 30, TimeUnit.MINUTES)
+            .addTag("subscription")
+            .setConstraints(constraint)
+            .build()
+
+        instance.enqueueUniquePeriodicWork("subscription", ExistingPeriodicWorkPolicy.KEEP, myRequest)
+    }
+
+    private fun statusWorker(){
         val instance = WorkManager.getInstance(applicationContext)
         val workInfo = instance.getWorkInfosByTag("subscription")
-        if(workInfo.get().isEmpty()){
-            Log.i("self-about","WokManager started")
-
-            val constraint = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val myRequest = PeriodicWorkRequest.Builder(Work::class.java, 15, TimeUnit.MINUTES)
-                .addTag("subscription")
-                .setConstraints(constraint)
-                .build()
-
-            instance.enqueue(myRequest)
-
-        }
+        workInfo.get().forEach { worker -> log(worker.state.toString()) }
     }
-    fun sendStatic(){
-        appComponents.getModel().sendStatic()
+
+
+    private fun log(msg: String){
+        Log.i("self-application", msg)
     }
 
     companion object{

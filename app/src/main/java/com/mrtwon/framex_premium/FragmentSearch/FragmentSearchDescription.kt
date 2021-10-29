@@ -1,5 +1,6 @@
 package com.mrtwon.framex_premium.FragmentSearch
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +44,8 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     lateinit var load: GifImageView
     lateinit var loadInRv: GifImageView
     lateinit var layout_rv: LinearLayout
+    lateinit var hide_help: ImageView
+    lateinit var help_layout: LinearLayout
     val list = arrayListOf<ContentResponse>()
     val saveState = Bundle()
 
@@ -57,6 +61,8 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
         loadInRv = view.findViewById(R.id.gif_load_in_rv)
         load = view.findViewById(R.id.gif_load)
         layout_rv = view.findViewById(R.id.layout_rv)
+        hide_help = view.findViewById(R.id.hide_help)
+        help_layout = view.findViewById(R.id.help_layout)
         welcome_search = view.welcome_image
         rv.itemAnimator = FadeInAnimator()
         rv.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -64,6 +70,7 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
             setDuration(200)
             setFirstOnly(false)
         }
+        hide_help.setOnClickListener{ hideHelpLayout() }
         view.chip_one.setOnClickListener(this)
         view.chip_two.setOnClickListener(this)
         view.chip_three.setOnClickListener(this)
@@ -217,6 +224,15 @@ class FragmentSearchDescription: Fragment(), View.OnClickListener {
     override fun onResume() {
         log("onResume()")
         super.onResume()
+    }
+
+    fun hideHelpLayout(){
+        ObjectAnimator.ofFloat(help_layout, "alpha", 0f).apply {
+            duration = 300
+            start()
+        }.addListener(onEnd = {
+            help_layout.visibility = View.GONE
+        })
     }
 
 

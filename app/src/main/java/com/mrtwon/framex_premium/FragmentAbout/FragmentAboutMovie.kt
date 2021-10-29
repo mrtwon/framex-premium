@@ -69,7 +69,7 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
 
         view.box.background = ResourcesCompat.getDrawable(resources, R.drawable.cornet_view_about, requireActivity().theme)
 
-        tool_bar.setNavigationIcon(R.drawable.ic_back)
+        //tool_bar.setNavigationIcon(R.drawable.ic_back)
         tool_bar.setNavigationOnClickListener(this)
         tool_bar.setOnMenuItemClickListener { onMenuItemClick(it) }
         view.look.setOnClickListener{ checkBlockAndStartActivity() }
@@ -129,6 +129,10 @@ class FragmentAboutMovie: Fragment(), View.OnClickListener, Toolbar.OnMenuItemCl
 
                 }
                 override fun onError(e: Exception?) {
+                    if(e == null){
+                        Log.i("self-about", "exception is null")
+                    }
+                    e?.printStackTrace()
                     view.poster.setImageResource(R.drawable.connect_error)
                 }
             })

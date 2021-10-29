@@ -16,7 +16,13 @@
         android:background="@color/colorPrimary"
         app:menu="@menu/toolbar_home"
         />
-
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/go_to_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Get Test"
+        />
     <androidx.core.widget.NestedScrollView
     android:layout_marginTop="20dp"
     android:layout_width="match_parent"

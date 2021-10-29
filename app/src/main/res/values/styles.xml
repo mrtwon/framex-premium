@@ -48,8 +48,19 @@
         <item name="color">@color/colorPrimaryDark</item>
     </style>
 
-
-
-
+    <style name="CardViewNotification" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialCardView.Cut</item>
+        <item name="cardBackgroundColor">@color/colorPrimary</item>
+    </style>
+    <style name="ShapeAppearanceOverlay.MaterialCardView.Cut" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+    <style name="BottomNavigationView" parent="@style/TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">13sp</item>
+    </style>
 
 </resources>

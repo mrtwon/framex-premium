@@ -23,6 +23,7 @@ class FilterRatingFragment: BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mView = inflater.inflate(R.layout.filter_content_layout, container, false)
         mView.layout_genres.visibility = View.GONE
+        mView.divider.visibility = View.GONE
         localFilter = mainTopVM.filterLiveData.value!!.copy()
         chipGroupRating = mView.chip_group_rating
         recoveryStateRating()

@@ -12,8 +12,8 @@ class MovieDataBinding(val movie: Movie){
     var ru_title: String = movie.ru_title ?: NO_DATA
         get() = if(movie.year != null) "$field  (${movie.year})" else field
     var description: String = movie.description ?: NO_DESCRIPTION
-    var kp_rating: String = roundRating(movie.kinopoisk_raintg?.toDouble())
-    var imdb_rating: String = roundRating(movie.imdb_rating?.toDouble())
+    var kp_rating: String = roundRating(movie.kinopoisk_raintg)
+    var imdb_rating: String = roundRating(movie.imdb_rating)
 
 
 

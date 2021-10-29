@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="genres_cardview_size">420dp</dimen>
+    <dimen name="genres_title_size">21sp</dimen>
+    <dimen name="genres_poster_size">115dp</dimen>
+    <dimen name="genres_title_height">30dp</dimen>
+
+    <dimen name="history_layout_size">420dp</dimen>
+
+    <dimen name="bottom_bar_size_icon">28dp</dimen>
+    <dimen name="bottom_bar_size">48dp</dimen>
+
+    <dimen name="recent_image_size_width">140dp</dimen>
+    <dimen name="recent_image_size_height">180dp</dimen>
+    <dimen name="recent_title_size">16sp</dimen>
+
+    <dimen name="about_title_size">24sp</dimen>
+    <dimen name="about_description_size">19sp</dimen>
+    <dimen name="about_genres_size">18sp</dimen>
+    <dimen name="about_icon_rating_size_width">35dp</dimen>
+    <dimen name="about_icon_rating_size_height">35dp</dimen>
+    <dimen name="about_rating_size">30sp</dimen>
+    <dimen name="about_poster_size_width">194dp</dimen>
+    <dimen name="about_poster_size_height">270dp</dimen>
+    <dimen name="about_margin_top">300dp</dimen>
+    <dimen name="about_button_margin_right">20dp</dimen>
+    <dimen name="about_button_text_size">16sp</dimen>
+    <dimen name="about_description_margin_top">8dp</dimen>
+    <dimen name="about_layout_margin">15dp</dimen>
+    <dimen name="about_title_padding">10dp</dimen>
+
+    <dimen name="top_cardview_size_width">170dp</dimen>
+    <dimen name="top_cardview_size_height">285dp</dimen>
+    <dimen name="top_image_size_height">220dp</dimen>
+    <dimen name="top_title_size">14sp</dimen>
+    <dimen name="top_rating_text_size">20sp</dimen>
+    <dimen name="top_rating_image_size">21dp</dimen>
+    <dimen name="top_tab_text_size">20sp</dimen>
+    <dimen name="top_tab_select_text_size">21sp</dimen>
+
+    <dimen name="top_frame_layout_width">225dp</dimen>
+    <dimen name="top_frame_layout_height">325dp</dimen>
+
+    <dimen name="filter_item_size">25sp</dimen>
+    <dimen name="filter_chip_text_size">21sp</dimen>
+
+    <dimen name="favorite_cardview_size_width">180dp</dimen>
+    <dimen name="favorite_cardview_size_height">320dp</dimen>
+
+    <dimen name="favorite_poster_size_height">215dp</dimen>
+    <dimen name="favorite_title_size">16sp</dimen>
+    <dimen name="favorite_label_size">19sp</dimen>
+    <dimen name="favorite_button_text_size">14sp</dimen>
+
+    <dimen name="favorite_frame_layout_width">225dp</dimen>
+    <dimen name="favorite_frame_layout_height">350dp</dimen>
+
+    <dimen name="search_button_text_size">16sp</dimen>
+    <dimen name="search_welcome_image_size_width">400dp</dimen>
+    <dimen name="search_chip_text_size">18sp</dimen>
+    <dimen name="search_help_text_size">17sp</dimen>
+    <dimen name="search_description_text_size">19sp</dimen>
+    <dimen name="search_title_text_size">20sp</dimen>
+
+    <dimen name="notification_title_size">22sp</dimen>
+    <dimen name="notification_text_size">20sp</dimen>
+
+    <dimen name="subscription_help_text_size">20sp</dimen>
+    <dimen name="subscription_label_size">29sp</dimen>
+
+
+</resources>

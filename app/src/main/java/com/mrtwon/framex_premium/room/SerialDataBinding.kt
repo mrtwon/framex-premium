@@ -11,8 +11,8 @@ class SerialDataBinding(val serial: Serial){
     var ru_title: String = serial.ru_title ?: NO_DATA
         get() = if(serial.year != null) "$field  (${serial.year})" else field
     var description: String = serial.description ?: NO_DATA
-    var kp_rating: String = HelperFunction.roundRating(serial.kinopoisk_raintg?.toDouble())
-    var imdb_rating: String = HelperFunction.roundRating(serial.imdb_rating?.toDouble())
+    var kp_rating: String = HelperFunction.roundRating(serial.kinopoisk_raintg)
+    var imdb_rating: String = HelperFunction.roundRating(serial.imdb_rating)
 
 
     //helper function

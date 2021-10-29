@@ -22,11 +22,16 @@ class ApiModule {
 
     @Singleton
     @Provides
-    fun getFxApi(client: OkHttpClient): FramexApi{
+    fun getFxApi(): FramexApi{
         return Retrofit.Builder()
-            .baseUrl("http://195.58.48.9/")
+            .baseUrl("http://192.168.1.217/")
             .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
+            .client(
+                OkHttpClient().newBuilder()
+                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .cache(Cache(MyApplication.getInstance.cacheDir, 20 * 1024 * 1024 ))
+                .build())
             .build()
             .create(FramexApi::class.java)
     }

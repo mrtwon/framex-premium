@@ -6,7 +6,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_marginTop="10dp">
-
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/test_send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -1,6 +1,7 @@
 package com.mrtwon.framex_premium.FragmentHome
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.mrtwon.framex_premium.ActivityAuth.AuthActivity
+import com.mrtwon.framex_premium.ActivityProfile.ActivityProfile
 import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
 import com.mrtwon.framex_premium.Content.ParcelableEnum
@@ -35,7 +38,6 @@ import kotlinx.android.synthetic.main.fragment_about_movie.*
 import kotlinx.android.synthetic.main.fragment_about_movie.view.*
 import kotlinx.android.synthetic.main.fragment_about_movie.view.tool_bar
 import kotlinx.android.synthetic.main.fragment_home.view.*
-import kotlinx.android.synthetic.main.layout_report_fragment.view.*
 
 class FragmentHome: Fragment() {
     val vm: MainViewModel by lazy { ViewModelProvider(requireActivity()).get(MainViewModel::class.java) }
@@ -50,6 +52,11 @@ class FragmentHome: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        view.go_to_test.setOnClickListener{
+            //(requireActivity() as MainActivity).navController.navigate(R.id.action_fragmentHome_to_testFragment)
+            startActivity(Intent(requireContext(), ActivityProfile::class.java))
+        }
+
         recent_rv = view.recycler_view_recent
         card_view_recent = view.recent_card_view
         recent_rv.adapter = AdapterRecent(listRecent)
@@ -61,13 +68,9 @@ class FragmentHome: Fragment() {
         }
         recent_rv.itemAnimator = FadeInAnimator()
 
+
         clickListener(view)
         return view
-    }
-
-    override fun onStart() {
-        (activity as MainActivity).reselectedNavigationPosition()
-        super.onStart()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,7 +78,7 @@ class FragmentHome: Fragment() {
         vm.getRecent()
         super.onViewCreated(view, savedInstanceState)
     }
-    fun observerRecent(){
+    private fun observerRecent(){
         vm.listRecent.observe(viewLifecycleOwner, Observer {
             if(it.size > 0){
                 listRecent.clear()
@@ -88,13 +91,7 @@ class FragmentHome: Fragment() {
         })
     }
 
-    fun showBottomSheetDialog(){
-        val dialog = BottomSheetDialog(requireContext())
-        dialog.setContentView(R.layout.layout_report_fragment)
-        dialog.show()
-    }
-
-    fun clickListener(v: View){
+    private fun clickListener(v: View){
         v.apply {
             findViewById<CardView>(R.id.new_type).setOnClickListener{
                 controller.navigate(R.id.action_fragmentHome_to_fragmentTop, Bundle().apply {

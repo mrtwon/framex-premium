@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="serial"
+            type="com.mrtwon.framex_premium.room.SerialDataBinding" />
+    </data>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/frame_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gif_load"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/gif_load"
+                android:layout_gravity="center"
+                android:alpha="0.7"
+                tools:visibility="gone"
+                android:visibility="gone"
+                />
+            <include
+                android:id="@+id/not_found"
+                layout="@layout/layout_not_found"
+                tools:visibility="gone"
+                android:visibility="gone"
+                />
+            <include
+                android:id="@+id/error_load"
+                layout="@layout/layout_error_load"
+                tools:visibility="gone"
+                android:visibility="gone"
+                />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:theme="@style/AppTheme.About"
+            android:fitsSystemWindows="true"
+            android:visibility="visible">
+            <ImageView
+                android:id="@+id/background_poster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/tool_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    app:menu="@menu/toolbar_menu"
+                    app:navigationIcon="@drawable/ic_back"
+                    />
+
+                <ImageView
+                    android:id="@+id/poster"
+                    android:layout_width="@dimen/about_poster_size_width"
+                    android:layout_height="@dimen/about_poster_size_height"
+                    android:layout_gravity="center|top"
+                    android:scaleType="fitXY"
+                    android:layout_marginTop="15dp" />
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="@dimen/about_layout_margin"
+                    android:layout_marginEnd="@dimen/about_layout_margin"
+                    android:layout_marginBottom="20dp">
+                <LinearLayout
+                    android:id="@+id/box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.9"
+                    android:background="#000"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="@{serial.ru_title}"
+                        android:textAlignment="center"
+                        android:textColor="#E1E1E1"
+                        android:textSize="@dimen/about_title_size"
+                        android:textStyle="bold"
+                        android:paddingStart="@dimen/about_title_padding"
+                        android:paddingEnd="@dimen/about_title_padding"
+                        tools:text="Теория Большого Взрыва Взрыва  Взрыва Взрыва(2008) " />
+
+                    <TextView
+                        android:id="@+id/genres"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:text="@{serial.genres}"
+                        android:textColor="#E1E1E1"
+                        android:textSize="@dimen/about_genres_size"
+                        android:textStyle="italic"
+                        tools:text="(комедия, ситком, драма, комедия)" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="@dimen/about_icon_rating_size_width"
+                                android:layout_height="@dimen/about_icon_rating_size_height"
+                                android:layout_gravity="center"
+                                android:layout_marginRight="5dp"
+                                app:srcCompat="@drawable/kp_rating" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="serif"
+                                android:text="@{serial.kp_rating}"
+                                android:textColor="#E1E1E1"
+                                android:textSize="@dimen/about_rating_size"
+                                android:textStyle="bold"
+                                tools:text="8.7" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp">
+
+                            <ImageView
+                                android:layout_width="@dimen/about_icon_rating_size_width"
+                                android:layout_height="@dimen/about_icon_rating_size_height"
+                                android:layout_gravity="center"
+                                app:srcCompat="@drawable/imdb_rating" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:fontFamily="serif"
+                                android:text="@{serial.imdb_rating}"
+                                android:textColor="#E1E1E1"
+                                android:textSize="@dimen/about_rating_size"
+                                android:textStyle="bold"
+                                tools:text="8.9" />
+                        </LinearLayout>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/subscription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/about_button_margin_right"
+                            android:drawableLeft="@drawable/ic_notification"
+                            android:fontFamily="monospace"
+                            android:text="@string/text_button_subscription"
+                            android:textSize="@dimen/about_button_text_size"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/look"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableRight="@drawable/ic_look"
+                            android:fontFamily="monospace"
+                            android:text="@string/text_button_look"
+                            android:textSize="@dimen/about_button_text_size"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/about_description_margin_top"
+                            android:alpha="0.7"
+                            android:fontFamily="sans-serif-condensed"
+                            android:gravity="center"
+                            android:letterSpacing="0.09"
+                            android:padding="10dp"
+                            android:text="@{serial.description}"
+                            android:textAlignment="center"
+                            android:textColor="#E1E1E1"
+                            android:textSize="@dimen/about_description_size"
+                            android:textStyle="italic"
+                            tools:text="Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин.Два блестящих физика Леонард и Шелдон - великие умы, которые понимают, как устроена вселенная. Но их гениальность ничуть не помогает им общаться с людьми, особенно с женщинами. Всё начинает меняться, когда напротив них поселяется красавица Пенни. \n\rСтоит также отметить пару странных друзей этих физиков: Воловиц который любит употреблять фразы на разных языках, включая русский, а Раджеш Кутрапали теряет дар речи при виде женщин." />
+                    </androidx.core.widget.NestedScrollView>
+                </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+
+        </FrameLayout>
+    </FrameLayout>
+</layout>

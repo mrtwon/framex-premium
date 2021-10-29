@@ -23,6 +23,7 @@ import com.mrtwon.framex_premium.Content.ContentTypeEnum
 import com.mrtwon.framex_premium.Content.GenresEnum
 import com.mrtwon.framex_premium.Content.ParcelableEnum
 import com.mrtwon.framex_premium.ContentResponse.ContentResponse
+import com.mrtwon.framex_premium.Helper.HelperFunction
 import com.mrtwon.framex_premium.Helper.HelperFunction.Companion.roundRating
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.MyApplication
@@ -187,11 +188,9 @@ class FragmentTopContent: Fragment(), View.OnClickListener {
                 })
             }
 
-            rating_kp.text = roundRating(content.kinopoisk_raintg?.toDouble())
-            rating_imdb.text = roundRating(content.imdb_rating?.toDouble())
-            if(content.ru_title != null){
-                title.text = content.ru_title
-            }
+            rating_kp.text = roundRating(content.kinopoisk_raintg)
+            rating_imdb.text = roundRating(content.imdb_rating)
+            title.text = HelperFunction.cutTopTitle(content.ru_title)
             content_layout.setOnClickListener {
                 val bundle = Bundle().apply {
                     putInt("id", content.id)

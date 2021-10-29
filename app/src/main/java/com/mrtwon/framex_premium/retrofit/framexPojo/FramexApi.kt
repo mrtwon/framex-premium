@@ -1,5 +1,6 @@
 package com.mrtwon.framex_premium.retrofit.framexPojo
 
+import com.mrtwon.framex_premium.retrofit.framexAuth.ResponseUser
 import com.mrtwon.framex_premium.retrofit.framexPojo.responseMovie.ResponseMovie
 import com.mrtwon.framex_premium.retrofit.framexPojo.responseSerial.ResponseSerial
 import retrofit2.Call
@@ -45,4 +46,15 @@ interface FramexApi {
 
   @GET("api/static")
   fun sendStatic(@Query("model") model: String, @Query("api") api: Int): Call<Unit>
+
+  // fx api auth
+  @GET("api/auth/createUser")
+  fun sendCreateUserRequest(@Query("token") token: String) : Call<Unit>
+  @GET("api/auth/giveMe")
+  fun giveMeProfile(@Query("token") token: String) : Call<ResponseUser>
+  @GET("api/auth/createNickName")
+  fun createNickName(@Query("token") token: String, @Query("nickname") nickName: String): Call<Unit>
+
+  @GET("ping")
+  fun pingFxServer(): Call<Unit>
 }

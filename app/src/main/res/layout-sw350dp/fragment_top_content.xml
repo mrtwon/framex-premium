@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tl="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/top_image"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:src="@drawable/new_content"
+        android:scaleType="centerCrop"
+        android:alpha="0.7"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="90dp"
+        android:background="@drawable/corner_view">
+
+
+
+
+
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            >
+
+            <com.dueeeke.tablayout.SlidingTabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="170dp"
+                android:layout_height="46dp"
+                android:layout_gravity="center"
+                tl:tl_indicator_anim_enable="true"
+                tl:tl_indicator_bounce_enable="false"
+                tl:tl_indicator_color="@color/colorPrimary"
+                tl:tl_indicator_corner_radius="5dp"
+                tl:tl_indicator_style="BLOCK"
+                tl:tl_tab_width="85dp"
+                tl:tl_textSelectColor="@color/colorPrimaryDark"
+                tl:tl_textSelectSize="@dimen/top_tab_select_text_size"
+                tl:tl_textSize="@dimen/top_tab_text_size"
+                tl:tl_textUnselectedColor="#000" />
+
+            <ImageButton
+                android:id="@+id/btn_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_filter"
+                android:layout_gravity="end|center"
+                />
+        </FrameLayout>
+
+
+
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        />
+    </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

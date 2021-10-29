@@ -1,26 +1,40 @@
 package com.mrtwon.framex_premium.FragmentSubscription
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowMetrics
 import android.widget.*
+import androidx.cardview.widget.CardView
+import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
+import com.google.android.material.card.MaterialCardView
 import com.mrtwon.framex_premium.ActivityWebView.ActivityWebView
 import com.mrtwon.framex_premium.Helper.HelperFunction
+import com.mrtwon.framex_premium.Helper.SwipeListener
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.MyApplication
 import com.mrtwon.framex_premium.R
+import com.mrtwon.framex_premium.WorkManager.Work
 import com.mrtwon.framex_premium.room.Notification
 import com.mrtwon.framex_premium.room.Subscription
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_subscription.view.*
+import kotlinx.android.synthetic.main.one_element_notification.view.*
+import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class FragmentSubscription:  Fragment(){
     val vm: SubscriptionVM by lazy { ViewModelProvider(this).get(SubscriptionVM::class.java) }
@@ -32,6 +46,8 @@ class FragmentSubscription:  Fragment(){
     lateinit var helper_subscript: TextView
     lateinit var state_workmanager_online: TextView
     lateinit var state_workmanager_offline: TextView
+    lateinit var layout_notification: LinearLayout
+    private val NOTIFICATION_FORMAT = "%s сезон %s серия уже доступна"
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,19 +55,60 @@ class FragmentSubscription:  Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        rv_notification = view.findViewById(R.id.rv_notification)
         rv_subscription = view.findViewById(R.id.rv_subscription)
         helper_notify = view.findViewById(R.id.helper_notification)
         helper_subscript = view.findViewById(R.id.helper_subscription)
         state_workmanager_online = view.findViewById(R.id.state_online)
         state_workmanager_offline = view.findViewById(R.id.state_offline)
+        layout_notification = view.findViewById(R.id.layout_notification)
         rv_subscription.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-        rv_notification.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        rv_notification.adapter = AdapterNotification(listNotification)
         rv_subscription.adapter = SubscriptionAdapter(listSubscription)
+        view.test_send.setOnClickListener{
+            val instance = WorkManager.getInstance(MyApplication.getInstance.applicationContext)
+
+            val constraint = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val myRequest = OneTimeWorkRequest.Builder(Work::class.java)
+                .setConstraints(constraint)
+                .addTag("test-subscription")
+                .build()
+            instance.enqueue(myRequest)
+
+        }
         observerNotification()
         observerSubscription()
+        helper_notify.visibility = View.GONE
         super.onViewCreated(view, savedInstanceState)
+    }
+
+
+    private fun addView(list: List<Notification>){
+        for(one_element in list){
+            val mView = layoutInflater.inflate(R.layout.test_one_element_notification, layout_notification, false)
+            mView.ru_title.text = "\uD83C\uDFAC ${HelperFunction.cutNotificationTitle(one_element.ru_title)}"
+            mView.season_and_episode.text = String.format(NOTIFICATION_FORMAT, one_element.season, one_element.series)
+            mView.setOnTouchListener(SwipeListener(right = {
+                mView.alpha = 0.7f
+                ObjectAnimator.ofFloat(mView, "translationX", widthDisplayPx()).apply {
+                    duration = 300
+                    start()
+                }.addListener(
+                    onEnd = {
+                        vm.removeNotification(one_element)
+                        layout_notification.removeView(mView)
+                    }
+                )
+            }))
+            mView.findViewById<ImageView>(R.id.play).setOnClickListener{
+                log("click")
+                (requireActivity() as MainActivity).navController.navigate(R.id.fragmentAboutSerial, Bundle().apply {
+                    putInt("id", one_element.content_id)
+                })
+            }
+            layout_notification.addView(mView)
+        }
     }
 
     override fun onStart() {
@@ -59,7 +116,7 @@ class FragmentSubscription:  Fragment(){
         super.onStart()
     }
 
-    fun observerSubscription(){
+    private fun observerSubscription(){
         vm.subscriptionListLiveData.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 helper_subscript.visibility = View.VISIBLE
@@ -74,18 +131,18 @@ class FragmentSubscription:  Fragment(){
             }
         }
     }
-    fun observerNotification(){
+    private fun observerNotification(){
         vm.notificationListLiveData.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
-                rv_notification.visibility = View.GONE
+                log("notification action")
+                layout_notification.visibility = View.GONE
                 helper_notify.visibility = View.VISIBLE
             } else {
-                rv_notification.visibility = View.VISIBLE
+                log("notification action with data, size = ${it.size}")
+                layout_notification.visibility = View.VISIBLE
                 helper_notify.visibility = View.GONE
-                listNotification.clear()
-                listNotification.addAll(it)
-                listNotification.reverse()
-                rv_notification.adapter?.notifyDataSetChanged()
+                layout_notification.removeAllViews()
+                addView(it.reversed())
             }
         }
 
@@ -107,7 +164,6 @@ class FragmentSubscription:  Fragment(){
     }
 
 
-    // subscription element
     inner class SubscriptionViewHolder(private val itemView: View): RecyclerView.ViewHolder(itemView){
         val poster: ImageView = itemView.findViewById(R.id.poster)
         val delete: ImageButton = itemView.findViewById(R.id.btn_delete_subscription)
@@ -137,41 +193,11 @@ class FragmentSubscription:  Fragment(){
 
     }
 
-
-
-    // notification element
-    inner class NotificationViewHolder(private val itemView: View): RecyclerView.ViewHolder(itemView){
-        var ru_title: TextView = itemView.findViewById(R.id.ru_title)
-        var season_and_episode: TextView = itemView.findViewById(R.id.season_and_episode)
-        var delete: ImageButton = itemView.findViewById(R.id.delete)
-        var layout: LinearLayout = itemView.findViewById(R.id.content_layout)
-        fun bind(notification: Notification){
-            ru_title.text = HelperFunction.substringTitle(notification.ru_title)
-            season_and_episode.text = "${notification.season} x ${notification.series}"
-            delete.setOnClickListener{
-                vm.removeNotification(notification)
-            }
-            layout.setOnClickListener{
-                val intent = Intent(requireActivity(), ActivityWebView::class.java).apply {
-                    putExtra("id", notification.content_id)
-                    putExtra("content_type","tv_series")
-                }
-                startActivity(intent)
-            }
-        }
+    private fun widthDisplayPx(): Float{
+        return Resources.getSystem().displayMetrics.widthPixels.toFloat()
     }
-    inner class AdapterNotification(val list: List<Notification>): RecyclerView.Adapter<NotificationViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
-            return NotificationViewHolder(layoutInflater.inflate(R.layout.one_element_notification, parent, false))
-        }
 
-        override fun onBindViewHolder(holder: NotificationViewHolder, position: Int){
-            holder.bind(list[position])
-        }
-
-        override fun getItemCount(): Int {
-            return list.size
-        }
-
+    private fun log(s: String){
+        Log.i("self-subscription", s)
     }
 }
