@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mrtwon.framex_premium.ActivityAuth.AuthActivity
+import com.mrtwon.framex_premium.ActivityAuth.Test
 import com.mrtwon.framex_premium.ActivityProfile.ActivityProfile
 import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.Content.GenresEnum

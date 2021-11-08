@@ -1,12 +1,18 @@
 package com.mrtwon.framex_premium.Model
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.LiveData
 import com.example.testbook.Retrofit.Kinopoisk.KinopoiskApi
 import com.github.mrtwon.library.XmlParse
+import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
 import com.google.gson.GsonBuilder
 import com.mrtwon.framex_premium.Content.CollectionContentEnum
 import com.mrtwon.framex_premium.room.Database
@@ -29,6 +35,8 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import java.lang.Exception
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -39,148 +47,231 @@ import kotlin.coroutines.suspendCoroutine
  */
 class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private val videoCdnApi: VideoCdnApi, private val ratingApi: XmlParse, private val fxApi: FramexApi) {
     val auth = FirebaseAuth.getInstance()
+    val storage = Firebase.storage
     /*
     Model Api Fx Auth
      */
 
-    fun giveMeUserProfile(
+    fun isAuth(callbackIsAuth: (Boolean) -> Unit, callbackError: (DetailsError) -> Unit){
+        try {
+            callbackIsAuth(auth.currentUser != null)
+        }catch (e: Exception){
+            callbackError(ERR_UNKNOWN)
+        }
+    }
+    fun logout(callbackError: (DetailsError) -> Unit){
+        try{
+            auth.signOut()
+        }catch (e: Exception){
+            val returnError = when(e){
+                is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                is ConnectException -> ERR_NO_CONNECT_FATAL
+                else -> ERR_UNKNOWN
+            }
+            callbackError(returnError)
+        }
+    }
+
+    suspend fun giveMeUserProfile(
         callbackError: (DetailsError) -> Unit,
         callbackProfile: (ResponseUser) -> Unit
     ) {
-        GlobalScope.launch {
-            val resultToken = giveIdToken(callbackError)
-            resultToken?.let { token ->
-                fxApi.giveMeProfile(token).enqueue(object : Callback<ResponseUser> {
-                    override fun onResponse(
-                        call: Call<ResponseUser>,
-                        response: retrofit2.Response<ResponseUser>
-                    ) {
-                        if (response.isSuccessful) {
-                            if (response.body() != null) {
-                                callbackProfile(response.body()!!)
-                            } else {
-                                callbackError(ERR_NO_READY_ANSWER)
-                            }
+        giveIdToken(callbackError)?.let { token ->
+            try {
+                fxApi.giveMeProfile(token).execute().let { response ->
+                    if (response.isSuccessful) {
+                        if (response.body() != null) {
+                            callbackProfile(response.body()!!)
                         } else {
-                            val typeError = getTypeError(response.code())
-                            val gson = GsonBuilder().create()
-                            try {
-                                val responseError: ResponseError = gson.fromJson(
-                                    response.errorBody()?.string(),
-                                    ResponseError::class.java
-                                )
-                                callbackError(
-                                    DetailsError.fromResponseError(
-                                        typeError,
-                                        responseError
-                                    )
-                                )
-                            } catch (e: Exception) {
-                                callbackError(ERR_NO_READY_ANSWER)
-                            }
+                            callbackError(ERR_NO_READY_ANSWER)
                         }
+                    } else {
+                        processingException(
+                            response.errorBody()?.string(),
+                            callbackError,
+                            response.code()
+                        )
                     }
-
-                    override fun onFailure(call: Call<ResponseUser>, t: Throwable) {
-
-                    }
-                })
+                }
+            }catch (e: Exception){
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                e.printStackTrace()
+                callbackError(returnError)
             }
         }
     }
 
-        fun createNickName(
+    suspend fun createPhoto(photo: Uri, callbackError: (DetailsError) -> Unit, callbackConfirm: (Boolean) -> Unit){
+        try{
+            if(!pingFxServer(callbackError)) return
+            uploadPhoto(photo, callbackError)?.let { photoUrl ->
+                giveIdToken(callbackError)?.let {  token ->
+                    fxApi.createPhoto(token, photoUrl).execute().let { response ->
+                        if(response.isSuccessful){
+                            callbackConfirm(true)
+                        }else{
+                            processingException(
+                                response.errorBody()?.string(),
+                                callbackError,
+                                response.code()
+                            )
+                        }
+                    }
+                }
+            }
+
+        }catch (e: Exception){
+            val returnError = when(e){
+                is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                is ConnectException -> ERR_NO_CONNECT_FATAL
+                else -> ERR_UNKNOWN
+            }
+            callbackError(returnError)
+        }
+    }
+        suspend fun createNickName(
             nickName: String,
             callbackError: (DetailsError) -> Unit,
             callbackConfirm: (Boolean) -> Unit
         ) {
-            GlobalScope.launch {
-                val resultToken = giveIdToken(callbackError)
-                resultToken?.let { token ->
-                    fxApi.createNickName(token, nickName).enqueue(object : Callback<Unit> {
-                        override fun onResponse(call: Call<Unit>, response: retrofit2.Response<Unit>) {
-                            if (response.isSuccessful) {
-                                callbackConfirm(true)
-                            } else {
-                                val gson = GsonBuilder().create()
-                                val typeError = getTypeError(response.code())
-                                try {
-                                    val responseError: ResponseError = gson.fromJson(
-                                        response.errorBody()?.string(),
-                                        ResponseError::class.java
-                                    )
-                                    callbackError(DetailsError.fromResponseError(typeError, responseError))
-                                } catch (e: Exception) {
-                                    callbackError(ERR_NO_READY_ANSWER)
-                                }
-                            }
+            try {
+                giveIdToken(callbackError)?.let { token ->
+                    fxApi.createNickName(token, nickName).execute().let { response ->
+                        if (response.isSuccessful) {
+                            callbackConfirm(true)
+                        } else {
+                            processingException(
+                                response.errorBody()?.string(),
+                                callbackError,
+                                response.code()
+                            )
                         }
-
-                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-
-                        }
-
-                    })
+                    }
                 }
+            }catch (e: Exception){
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                callbackError(returnError)
             }
-
         }
 
-        fun sendCreateUserRequest(
+        suspend fun sendCreateUserRequest(
             email: String,
             password: String,
             callbackError: (DetailsError) -> Unit,
             callbackConfirm: (Boolean) -> Unit
         ) {
-            GlobalScope.launch {
-                if(!pingFxServer()){
-                    callbackError(ERR_TIMEOUT)
-                    return@launch
-                }
-                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        launch {
-                            giveIdToken(callbackError)?.let { token ->
-                                fxApi.sendCreateUserRequest(token).enqueue(object : Callback<Unit> {
-                                    override fun onResponse(
-                                        call: Call<Unit>,
-                                        response: retrofit2.Response<Unit>
-                                    ) {
-                                        if (response.isSuccessful) {
-                                            callbackConfirm(true)
-                                        } else {
-                                            val gson = GsonBuilder().create()
-                                            val typeError = getTypeError(response.code())
-                                            try {
-                                                val responseError: ResponseError = gson.fromJson(
-                                                    response.errorBody()?.string(),
-                                                    ResponseError::class.java
-                                                )
-                                                callbackError(
-                                                    DetailsError.fromResponseError(
-                                                        typeError,
-                                                        responseError
-                                                    )
-                                                )
-                                            } catch (e: Exception) {
-                                                callbackError(ERR_NO_READY_ANSWER)
-                                            }
-                                        }
-                                    }
-
-                                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                                    }
-
-                                })
+            try {
+                if (!pingFxServer(callbackError)) return
+                if (registrationByEmailPassword(email, password, callbackError)) {
+                    giveIdToken(callbackError)?.let { token ->
+                        fxApi.sendCreateUserRequest(token).execute().let { response ->
+                            if (response.isSuccessful) {
+                                callbackConfirm(true)
+                            } else {
+                                processingException(
+                                    response.errorBody()?.string(),
+                                    callbackError,
+                                    response.code()
+                                )
                             }
                         }
-
-                    } else {
-                        callbackError(DetailsError.fromException(TYPE_ERROR.ERROR, task.exception))
                     }
                 }
+            }catch (e: Exception){
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                callbackError(returnError)
             }
         }
+
+        suspend fun createAboutMe(about: String, callbackError: (DetailsError) -> Unit, callbackConfirm: (Boolean) -> Unit) {
+            try {
+                giveIdToken(callbackError)?.let { token ->
+                    fxApi.createAboutMe(token, about).execute().let { response ->
+                        if (response.isSuccessful) {
+                            callbackConfirm(true)
+                        } else {
+                            processingException(
+                                response.errorBody()?.string(),
+                                callbackError,
+                                response.code()
+                            )
+                        }
+                    }
+                }
+            }catch (e: Exception){
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                callbackError(returnError)
+            }
+        }
+
+        suspend fun createFavoriteContent(favorite: String, callbackError: (DetailsError) -> Unit, callbackConfirm: (Boolean) -> Unit) {
+            try {
+                giveIdToken(callbackError)?.let { token ->
+                    fxApi.createFavorite(token, favorite).execute().let { response ->
+                        if (response.isSuccessful) {
+                            callbackConfirm(true)
+                        } else {
+                            processingException(
+                                response.errorBody()?.string(),
+                                callbackError,
+                                response.code()
+                            )
+                        }
+                    }
+                }
+            }catch (e: Exception){
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                callbackError(returnError)
+            }
+        }
+
+        suspend fun createOpenFavorite(isOpen: Boolean, callbackError: (DetailsError) -> Unit, callbackConfirm: (Boolean) -> Unit) {
+            try {
+                giveIdToken(callbackError)?.let { token ->
+                    val isOpenString = isOpen.toString().toLowerCase(Locale.ROOT)
+                    log("value is $isOpenString")
+                    fxApi.createOpenFavorite(token, isOpenString).execute().let { response ->
+                        if (response.isSuccessful) {
+                            callbackConfirm(true)
+                        } else {
+                            processingException(
+                                response.errorBody()?.string(),
+                                callbackError,
+                                response.code()
+                            )
+                        }
+                    }
+                }
+            }catch (e: Exception) {
+                val returnError = when(e){
+                    is SocketTimeoutException -> ERR_TIMEOUT_FATAL
+                    is ConnectException -> ERR_NO_CONNECT_FATAL
+                    else -> ERR_UNKNOWN
+                }
+                callbackError(returnError)
+            }
+        }
+
 
         fun login(email: String, password: String, callbackError: (DetailsError) -> Unit, callbackConfirm: (Boolean) -> Unit){
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
@@ -192,13 +283,14 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
             }
         }
 
-        suspend fun pingFxServer() = suspendCoroutine<Boolean> {
+        suspend fun pingFxServer(callbackError: (DetailsError) -> Unit) = suspendCoroutine<Boolean> {
             fxApi.pingFxServer().enqueue(object: Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: retrofit2.Response<Unit>) {
                     it.resume(true)
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    callbackError(ERR_TIMEOUT)
                     it.resume(false)
                 }
 
@@ -208,13 +300,6 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
         /*
     Model Api Fx
      */
-
-        fun sendStatic() {
-            GlobalScope.launch {
-                log("start send Static")
-                fxApi.sendStatic(Build.MODEL, Build.VERSION.SDK_INT).execute()
-            }
-        }
 
 
         fun getContentResponse(id: Int, contentType: String, callback: (ContentResponse?) -> Unit) {
@@ -640,7 +725,82 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
                 else -> TYPE_ERROR.ERROR
             }
         }
+        private suspend fun uploadPhoto(uri: Uri, callbackError: (DetailsError) -> Unit): String? = suspendCoroutine { coroutine ->
+            val reference = storage.reference
+            val uid = auth.currentUser?.uid
+            if(uid == null){
+                callbackError(ERR_NOT_AUTH)
+                coroutine.resume(null)
+            }
 
+            val mountainsRef = reference.child(uid.toString())
+            val mountainsImageRef = mountainsRef.child("avatar/${uid.toString()}")
+            val uploadTask = mountainsImageRef.putFile(uri)
+
+            uploadTask.continueWithTask { task ->
+                if(!task.isSuccessful){
+                    coroutine.resume(null)
+                    callbackError(DetailsError.fromException(exception = task.exception))
+                }
+                mountainsImageRef.downloadUrl
+            }.addOnCompleteListener {
+                if(it.isSuccessful){
+                    coroutine.resume(it.result.toString())
+                }else{
+                    log("error")
+                    it.exception?.printStackTrace()
+                }
+            }
+        }
+
+    /*
+    private void uploadFile() {
+    if (mImageUri != null) {
+        StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                + "." + getFileExtension(mImageUri));
+
+        fileReference.putFile(mImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                //change made here
+                return fileReference.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                        System.out.println("Upload success: " + downloadUri);
+                } else {
+                    // Handle failures
+                    // ...
+                }
+            }
+        });
+
+    } else {
+        Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+    }
+
+}
+     */
+
+
+        private suspend fun registrationByEmailPassword(email: String, password: String, callbackError: (DetailsError) -> Unit): Boolean = suspendCoroutine {
+               auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                   if(task.isSuccessful){
+                       it.resume(true)
+                   }else{
+                       callbackError(DetailsError.fromException(exception = task.exception))
+                       it.resume(false)
+                   }
+               }
+        }
         suspend fun giveIdToken(callbackError: (DetailsError) -> Unit) = suspendCoroutine<String?> { coroutine ->
             var token: String? = null
             with(Dispatchers.IO) {
@@ -671,11 +831,39 @@ class Model(val db: Database, private val kinopoiskApi: KinopoiskApi, private va
             }
         }
 
+        private fun processingException(responseString: String?, callbackError: (DetailsError) -> Unit, responseCode: Int? = null){
+            if(responseString == null){
+                log("is null")
+                callbackError(ERR_NO_READY_ANSWER)
+                return
+            }
+            val typeError: TYPE_ERROR = if(responseCode == null) TYPE_ERROR.ERROR else getTypeError(responseCode)
+            val gson = GsonBuilder().create()
+            try {
+                val responseError: ResponseError = gson.fromJson(
+                    responseString,
+                    ResponseError::class.java
+                )
+                callbackError(
+                    DetailsError.fromResponseError(
+                        typeError,
+                        responseError
+                    )
+                )
+            } catch (e: Exception) {
+                log("exception catch, response body: $responseString")
+                callbackError(ERR_NO_READY_ANSWER)
+            }
+        }
+
         private val ERR_NOT_AUTH = DetailsError(TYPE_ERROR.FALIED, "Ошибка", "Не авторизован")
         private val ERR_TOKEN = DetailsError(TYPE_ERROR.FALIED, "Ошибка", "Ошибка токена")
         private val ERR_UNKNOWN = DetailsError(TYPE_ERROR.FALIED, "Ошибка", "Произошла незапланированная ошибка")
         private val ERR_NO_READY_ANSWER = DetailsError(TYPE_ERROR.FALIED, "Ошибка", "Некорректный ответ от сервера, произошла незапланированная ошибка")
         private val ERR_TIMEOUT = DetailsError(TYPE_ERROR.ERROR, "Timeout", "Время ожидания ответа истекло, попробуйте еще раз")
+        private val ERR_TIMEOUT_FATAL = DetailsError(TYPE_ERROR.FALIED, "Timeout", "Время ожидания ответа истекло, попробуйте еще раз")
+        private val ERR_NO_CONNECT_FATAL = DetailsError(TYPE_ERROR.FALIED, "Connect error", "Проверьте подключение к сети")
+        private val ERR_NO_CONNECT = DetailsError(TYPE_ERROR.ERROR, "Connect error", "Проверьте подключение к сети")
         private fun errorOnClientSide(): DetailsError {
             return DetailsError(
                 TYPE_ERROR.ERROR,

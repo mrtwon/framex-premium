@@ -54,6 +54,14 @@ interface FramexApi {
   fun giveMeProfile(@Query("token") token: String) : Call<ResponseUser>
   @GET("api/auth/createNickName")
   fun createNickName(@Query("token") token: String, @Query("nickname") nickName: String): Call<Unit>
+  @GET("api/auth/createAboutMe")
+  fun createAboutMe(@Query("token") token: String, @Query("about") about: String): Call<Unit>
+  @GET("api/auth/createFavoriteContent")
+  fun createFavorite(@Query("token") token: String, @Query("favorite") favorite: String): Call<Unit>
+  @GET("api/auth/createFavoriteStatus")
+  fun createOpenFavorite(@Query("token") token: String, @Query("status") status: String): Call<Unit>
+  @GET("api/auth/createPhoto")
+  fun createPhoto(@Query("token") token: String, @Query("photo") photoUrl: String): Call<Unit>
 
   @GET("ping")
   fun pingFxServer(): Call<Unit>

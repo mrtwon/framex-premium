@@ -8,12 +8,16 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
+import com.mrtwon.framex_premium.ActivityAuth.AuthActivity
+import com.mrtwon.framex_premium.GeneralVM
 import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 
 class ActivityWelcome: AppCompatActivity(), View.OnClickListener {
+    private val generalVM = GeneralVM()
     lateinit var check_box: CheckBox
     lateinit var start: MaterialButton
     lateinit var image: ImageView
@@ -77,8 +81,15 @@ class ActivityWelcome: AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.start -> {
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
+                generalVM.model.isAuth({
+                    if(it)
+                        startActivity(Intent(this, MainActivity::class.java))
+                    else
+                        startActivity(Intent(this, AuthActivity::class.java))
+                    finish()
+                }, {
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                })
             }
         }
     }

@@ -32,5 +32,11 @@ data class ResponseItem(
 	val isBlocked: Boolean,
 
 	@field:SerializedName("_id")
-	val id: String
+	val id: String,
+
+	@field:SerializedName("isOpenFavorite")
+	val openFavorite: Boolean,
+
+	@field:SerializedName("photo")
+	val photo: String
 )

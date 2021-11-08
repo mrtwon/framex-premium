@@ -1,12 +1,15 @@
 package com.mrtwon.framex_premium
 
 import android.app.Application
+import android.content.Intent
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.text.format.Formatter
 import android.util.Log
 import androidx.work.*
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.mrtwon.framex_premium.ActivityAuth.AuthActivity
 import com.mrtwon.framex_premium.components.AppComponents
 import com.mrtwon.framex_premium.WorkManager.Work
 import com.mrtwon.framex_premium.components.DaggerAppComponents
@@ -29,6 +32,7 @@ class MyApplication: Application() {
         statusWorker()
         getInstance = this
         //startWorkManager()
+        //listenerAuthState()
         super.onCreate()
     }
 
@@ -59,6 +63,15 @@ class MyApplication: Application() {
         workInfo.get().forEach { worker -> log(worker.state.toString()) }
     }
 
+    private fun listenerAuthState(){
+        DaggerAppComponents.create().getFirebaseAuth().addAuthStateListener { state ->
+            if(state.currentUser == null){
+                startActivity(Intent(this, AuthActivity::class.java).apply {
+                    this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                })
+            }
+        }
+    }
 
     private fun log(msg: String){
         Log.i("self-application", msg)

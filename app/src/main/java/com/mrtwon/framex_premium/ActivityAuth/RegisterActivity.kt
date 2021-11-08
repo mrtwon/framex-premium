@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -52,14 +53,9 @@ class RegisterActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setContent {
-            Scaffold(
-                topBar = { TopAppBar { LabelApp() } },
-                modifier = Modifier.fillMaxSize()
-            ) {
                 MainLayout()
                 OpenDialog()
                 OpenProgressDialog()
-            }
         }
         observeConfirm()
         super.onCreate(savedInstanceState)
@@ -333,7 +329,7 @@ class RegisterActivity: AppCompatActivity() {
                         .size(100.dp)
                         .background(Color.White, shape = RoundedCornerShape(8.dp))
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = colorResource(id = R.color.colorPrimary))
                 }
             }
         }

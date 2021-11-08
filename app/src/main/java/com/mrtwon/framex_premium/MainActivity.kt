@@ -19,7 +19,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.mrtwon.framex_premium.ActivityAuth.AuthActivity
 import com.mrtwon.framex_premium.FragmentAbout.FragmentAboutMovie
+import com.mrtwon.framex_premium.components.DaggerAppComponents
 import com.squareup.picasso.Picasso
 import java.net.URI
 
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        listenerAuthState()
 
         val redirect = intent.getStringExtra("redirect")
         val action = intent.action
@@ -70,6 +73,16 @@ class MainActivity : AppCompatActivity() {
         when(charContent){
             "s" -> navController.navigate(R.id.fragmentAboutSerial, bundle)
             "m" -> navController.navigate(R.id.fragmentAboutMovie, bundle)
+        }
+    }
+
+    private fun listenerAuthState(){
+        DaggerAppComponents.create().getFirebaseAuth().addAuthStateListener { state ->
+            if(state.currentUser == null){
+                startActivity(Intent(this, AuthActivity::class.java).apply {
+                    this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                })
+            }
         }
     }
 

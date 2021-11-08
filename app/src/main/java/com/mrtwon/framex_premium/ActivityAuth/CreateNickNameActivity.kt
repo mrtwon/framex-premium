@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -36,6 +37,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.mrtwon.framex_premium.Helper.DetailsError
 import com.mrtwon.framex_premium.Helper.TYPE_ERROR
+import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 
 class CreateNickNameActivity: AppCompatActivity() {
@@ -48,13 +50,9 @@ class CreateNickNameActivity: AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContent {
-            Scaffold(
-                topBar = { TopAppBar { LabelApp() } },
-                modifier = Modifier.fillMaxSize()) {
                 MainLayout()
                 OpenDialog()
                 OpenProgressDialog()
-            }
         }
         observeConfirm()
         observeProfile()
@@ -72,6 +70,9 @@ class CreateNickNameActivity: AppCompatActivity() {
         vm.confirmLiveData.observe(this){
             if(it){
                 Toast.makeText(this, "Никнейм изменён", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                })
             }
         }
     }
@@ -266,7 +267,7 @@ class CreateNickNameActivity: AppCompatActivity() {
                         .size(100.dp)
                         .background(Color.White, shape = RoundedCornerShape(8.dp))
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = colorResource(id = R.color.colorPrimary))
                 }
             }
         }

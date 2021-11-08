@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 
 import androidx.compose.ui.text.SpanStyle
@@ -35,11 +36,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.mrtwon.framex_premium.Helper.DetailsError
 import com.mrtwon.framex_premium.Helper.TYPE_ERROR
+import com.mrtwon.framex_premium.MainActivity
 import com.mrtwon.framex_premium.R
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class AuthActivity: AppCompatActivity() {
@@ -54,15 +58,10 @@ class AuthActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         setContent {
-            Scaffold(
-                topBar = { TopAppBar { LabelApp() } },
-                modifier = Modifier.fillMaxSize()
-            ) {
                 MainLayout()
                 OpenDialog()
                 OpenProgressDialog()
                 OpenResetPasswordDialog()
-            }
         }
         observeConfirm()
         super.onCreate(savedInstanceState)
@@ -72,6 +71,9 @@ class AuthActivity: AppCompatActivity() {
         vm.confirmLiveData.observe(this){
             if(it){
                 Toast.makeText(this, "Вы авторизированны", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                })
             }
         }
     }
@@ -308,7 +310,7 @@ class AuthActivity: AppCompatActivity() {
                         .size(100.dp)
                         .background(Color.White, shape = RoundedCornerShape(8.dp))
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = colorResource(id = R.color.colorPrimary))
                 }
             }
         }
