@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/fragmentHome"
-        android:name="com.mrtwon.framex_premium.FragmentHome.FragmentHome"
+        android:name="com.mrtwon.framex_premium.screen.fragmentHome.FragmentHome"
         android:label="FragmentHome" >
         <action
             android:id="@+id/action_fragmentHome_to_fragmentTop"
@@ -21,16 +21,10 @@
         <action
             android:id="@+id/action_fragmentHome_to_fragmentSubscription"
             app:destination="@id/fragmentSubscription" />
-        <action
-            android:id="@+id/action_fragmentHome_to_fragmentTest"
-            app:destination="@id/fragmentTest" />
-        <action
-            android:id="@+id/action_fragmentHome_to_testFragment"
-            app:destination="@id/testFragment" />
     </fragment>
     <fragment
         android:id="@+id/fragmentTop"
-        android:name="com.mrtwon.framex_premium.FragmentTop.FragmentTop"
+        android:name="com.mrtwon.framex_premium.screen.fragmentTop.FragmentTop"
         android:label="FragmentTop" >
         <action
             android:id="@+id/action_fragmentTop_to_fragmentAboutMovie"
@@ -51,15 +45,15 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentAboutSerial"
-        android:name="com.mrtwon.framex_premium.FragmentAbout.FragmentAboutSerial"
+        android:name="com.mrtwon.framex_premium.screen.fragmentAbout.FragmentAboutSerial"
         android:label="FragmentAboutSerial" />
     <fragment
         android:id="@+id/fragmentAboutMovie"
-        android:name="com.mrtwon.framex_premium.FragmentAbout.FragmentAboutMovie"
+        android:name="com.mrtwon.framex_premium.screen.fragmentAbout.FragmentAboutMovie"
         android:label="FragmentAboutMovie" />
     <fragment
         android:id="@+id/fragmentFavorite"
-        android:name="com.mrtwon.framex_premium.FragmentFavorite.FragmentFavorite"
+        android:name="com.mrtwon.framex_premium.screen.fragmentFavorite.FragmentFavorite"
         android:label="FragmentFavorite" >
         <action
             android:id="@+id/action_fragmentFavorite_to_fragmentAboutSerial"
@@ -79,7 +73,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSearch"
-        android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearch"
+        android:name="com.mrtwon.framex_premium.screen.fragmentSearch.searchByTitle.FragmentSearchTitle"
         android:label="FragmentSearch" >
         <action
             android:id="@+id/action_fragmentSearch_to_fragmentAboutMovie"
@@ -103,7 +97,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSearchDescription"
-        android:name="com.mrtwon.framex_premium.FragmentSearch.FragmentSearchDescription"
+        android:name="com.mrtwon.framex_premium.screen.fragmentSearch.searchByDescription.FragmentSearchDescription"
         android:label="FragmentSearchDescription" >
         <action
             android:id="@+id/action_fragmentSearchDescription_to_fragmentAboutMovie"
@@ -125,18 +119,6 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSubscription"
-        android:name="com.mrtwon.framex_premium.FragmentSubscription.FragmentSubscription"
+        android:name="com.mrtwon.framex_premium.screen.fragmentSubscription.FragmentSubscription"
         android:label="FragmentSubscription" />
-    <fragment
-        android:id="@+id/fragmentTest"
-        android:name="com.mrtwon.framex_premium.FragmentTest"
-        android:label="FragmentTest" >
-        <action
-            android:id="@+id/action_fragmentTest_to_fragmentAboutMovie"
-            app:destination="@id/fragmentAboutMovie" />
-    </fragment>
-    <fragment
-        android:id="@+id/testFragment"
-        android:name="com.mrtwon.framex_premium.TestFragment"
-        android:label="TestFragment" />
 </navigation>

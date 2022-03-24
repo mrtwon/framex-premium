@@ -1,9 +1,9 @@
 package com.mrtwon.framex_premium.Helper
 
 import android.content.res.Resources
-import android.icu.math.BigDecimal
 import android.util.Log
-import com.mrtwon.framex_premium.Content.ContentTypeEnum
+import com.mrtwon.framex_premium.domain.entity.enum.ContentEnum
+import java.util.*
 
 class HelperFunction {
     /*
@@ -17,6 +17,15 @@ class HelperFunction {
             return if(rating.length > 3) rating.substring(0, 3) else rating
         }
 
+        fun getSecondTime(): Int{
+            return (Date().time / 1000).toInt()
+        }
+        fun getYear(): Int {
+            val calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault())
+            calendar.time = Date()
+            return calendar.get(Calendar.YEAR)
+        }
+
         //round rating and return Double result
        /*fun helperConvertDouble(rating: Double?): Double{
             if (rating == null) return 0.0
@@ -26,14 +35,11 @@ class HelperFunction {
 
         // 350 dp - рейтинги по центру нужны.
         // до 500dp история просмотров должна быть match parents
-        fun buildDeepLink(contentTypeEnum: ContentTypeEnum, id: Int): String?{
-            val contentResult = when(contentTypeEnum){
-                ContentTypeEnum.SERIAL ->{
-                    "s"
-                }
-                ContentTypeEnum.MOVIE -> {
-                    "m"
-                }
+        fun buildDeepLink(contentEnum: ContentEnum, id: Int): String?{
+            val contentResult = when(contentEnum){
+                ContentEnum.Serial -> "s"
+                ContentEnum.Movie -> "m"
+                else -> "undefined"
             }
             return "http://framex.application/$contentResult/$id"
         }

@@ -66,4 +66,10 @@
     <style name="BottomSheet" parent="">
         <item name="android:textSize">@dimen/filter_chip_text_size</item>
     </style>
+    
+    <style name="ToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">#ddd</item>
+        <item name="android:textColorSecondary">#ddd</item>
+        <item name="titleTextColor">#000000</item>
+    </style>
 </resources>

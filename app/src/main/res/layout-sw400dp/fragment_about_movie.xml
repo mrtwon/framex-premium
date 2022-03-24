@@ -7,7 +7,7 @@
 <data>
     <variable
         name="movie"
-        type="com.mrtwon.framex_premium.room.MovieDataBinding" />
+        type="com.mrtwon.framex_premium.screen.fragmentAbout.ContentDataBinding" />
 </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -98,7 +98,7 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
-                    android:text="@{movie.ru_title}"
+                    android:text="@{movie.ruTitle}"
                     android:textAlignment="center"
                     android:textColor="#E1E1E1"
                     android:textSize="@dimen/about_title_size"
@@ -142,7 +142,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
-                            android:text="@{movie.kp_rating}"
+                            android:text="@{movie.kpRating}"
                             android:textColor="#E1E1E1"
                             android:textSize="@dimen/about_rating_size"
                             android:textStyle="bold"
@@ -165,7 +165,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:fontFamily="serif"
-                            android:text="@{movie.imdb_rating}"
+                            android:text="@{movie.imdbRating}"
                             android:textColor="#E1E1E1"
                             android:textSize="@dimen/about_rating_size"
                             android:textStyle="bold"

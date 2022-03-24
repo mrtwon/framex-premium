@@ -5,9 +5,8 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import com.mrtwon.framex_premium.MyApplication
+import com.mrtwon.framex_premium.app.MyApplication
 import java.lang.Exception
-import kotlin.math.log
 
 class SwipeListener(val right: () -> Unit = {}, val left: () -> Unit = {}, val top: () -> Unit = {}, val bottom: () -> Unit = {}) : View.OnTouchListener{
 

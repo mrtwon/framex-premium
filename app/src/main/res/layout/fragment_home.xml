@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Get Test"
+        android:visibility="gone"
         />
     <androidx.core.widget.NestedScrollView
     android:layout_marginTop="20dp"

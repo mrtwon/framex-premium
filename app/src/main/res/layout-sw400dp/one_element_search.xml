@@ -30,8 +30,7 @@
         android:layout_height="match_parent"
         android:textSize="17sp"
         android:gravity="center"
-        android:padding="5dp"
-        tools:text="🎬  Как я встретил вашу маму (2020)"
+        tools:text="🎬  Как я встретил вашу маму (2020) Как я встретил вашу маму (2020) Как я встретил вашу маму (2020)"
         android:textStyle="bold"
         />
 </LinearLayout>

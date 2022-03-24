@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <application
-        android:name=".MyApplication"
+        android:name=".app.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/icon_app"
         android:label="@string/app_name"
@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         android:largeHeap="true">
-        <activity android:name="com.mrtwon.framex_premium.StartedActivity"
+        <activity android:name="com.mrtwon.framex_premium.screen.startActivity.StartedActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
@@ -26,15 +26,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.mrtwon.framex_premium.ActivityWebView.ActivityWebView"
+            android:name="com.mrtwon.framex_premium.screen.activityWebView.ActivityWebView"
             android:theme="@style/Style.Video"
             android:configChanges="orientation|screenSize"
             />
         <!--<activity android:name=".ActivityUpdate.ActivityUpdate"/>-->
-        <activity android:name="com.mrtwon.framex_premium.ActivityWelcome.ActivityWelcome"
+        <activity android:name="com.mrtwon.framex_premium.screen.activityWelcome.ActivityWelcome"
             android:screenOrientation="portrait"
             />
-        <activity android:name="com.mrtwon.framex_premium.MainActivity"
+        <activity android:name="com.mrtwon.framex_premium.screen.mainActivity.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true">
         <intent-filter>
@@ -47,12 +47,6 @@
                 />
         </intent-filter>
         </activity>
-        <activity android:name=".ActivityAuth.AuthActivity"/>
-        <activity android:name=".ActivityAuth.RegisterActivity"/>
-        <activity android:name=".ActivityAuth.CreateNickNameActivity"/>
-        <activity android:name=".ActivityProfile.ActivityProfile"/>
-        <activity android:name=".ActivityProfile.UpdatePhotoActivity"/>
-        <activity android:name=".ActivityAuth.Test"/>
     </application>
 
 </manifest>

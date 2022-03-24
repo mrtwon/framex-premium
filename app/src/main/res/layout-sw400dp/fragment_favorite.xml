@@ -9,6 +9,14 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/progressDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/errorDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
         <ImageView
             android:id="@+id/top_image"
             android:layout_width="match_parent"

@@ -44,13 +44,15 @@
             android:orientation="vertical"
             android:gravity="center"
             android:visibility="gone"
+            tools:visibility="visible"
             >
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:visibility="visible"
+                android:visibility="gone"
+                tools:visibility="visible"
 
                 />
             <pl.droidsonroids.gif.GifImageView
@@ -70,6 +72,7 @@
             android:alpha="0.5"
             android:src="@drawable/sherlok_stik_001"
             android:visibility="visible"
+            tools:visibility="gone"
             android:layout_gravity="center"
             />
         <include
